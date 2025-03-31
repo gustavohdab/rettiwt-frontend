@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Twitter Clone
+
+A modern Twitter clone built with Next.js 15 and React 19, showcasing the latest features and best practices.
+
+## Features
+
+-   Server Components for data-heavy views
+-   Real-time updates for timeline and notifications
+-   Mobile-first responsive design
+-   Authentication with Next Auth
+-   MongoDB for database with Mongoose
+-   Clean component architecture
+
+## Tech Stack
+
+### Frontend
+
+-   Next.js 15
+-   React 19
+-   TypeScript
+-   Tailwind CSS
+-   React Query
+-   Framer Motion
+
+### Backend
+
+-   Next.js API Routes
+-   MongoDB
+-   Authentication with JWT
+-   WebSockets for real-time updates
+
+## Project Structure
+
+The project follows a feature-based directory structure using the Next.js App Router:
+
+```
+twitter-clone/
+├── lib/
+│   ├── api/
+│   │   ├── axios.ts                 # Base axios config
+│   │   ├── types.ts                 # API response types
+│   │   └── services/
+│   │       ├── auth.service.ts      # Auth endpoints
+│   │       ├── tweet.service.ts     # Tweet endpoints
+│   │       └── user.service.ts      # User endpoints
+│   ├── hooks/
+│   │   ├── useAuth.ts               # Auth hook
+│   │   ├── useTweets.ts             # Tweet data hook
+│   │   └── useUsers.ts              # User data hook
+│   └── context/
+│       └── AuthContext.tsx          # Auth state management
+├── components/
+│   ├── auth/
+│   │   ├── LoginForm.tsx            # Login form (Client)
+│   │   └── RegisterForm.tsx         # Registration form (Client)
+│   ├── tweet/
+│   │   ├── TweetForm.tsx            # Create tweet (Client)
+│   │   ├── TweetList.tsx            # List of tweets (Server)
+│   │   └── TweetCard.tsx            # Tweet display (Client)
+│   └── layout/
+│       ├── AppShell.tsx             # Main layout wrapper
+│       └── Navbar.tsx               # Navigation bar (Client)
+└── app/
+    ├── providers.tsx                # All context providers
+    ├── (auth)/                      # Auth route group
+    │   ├── login/page.tsx           # Login page
+    │   └── register/page.tsx        # Register page
+    ├── feed/
+    │   └── page.tsx                 # Timeline (Server Component)
+    └── [username]/
+        └── page.tsx                 # User profile (Server Component)
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables:
+    - Copy `.env.example` to `.env.local` and fill in the values
+4. Run the development server: `npm run dev`
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Development Workflow
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project uses a milestone-based development approach:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Project Setup & Authentication
+2. User Profiles
+3. Tweet Creation & Timeline
+4. Interactions (likes, retweets, replies)
+5. Search & Discovery
+6. Notifications & Real-time
+7. Direct Messages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## License
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
