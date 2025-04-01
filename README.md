@@ -1,6 +1,6 @@
 # Twitter Clone Frontend (Next.js)
 
-This is the frontend application for the Twitter Clone project, built with Next.js 15, React 19, Tailwind CSS, and TypeScript. It interacts with the [backend API](../backend/README.md) to provide a Twitter-like user experience.
+This is the frontend application for the Twitter Clone project, built with Next.js 15, React 19, Tailwind CSS, and TypeScript. It interacts with the [backend API](https://github.com/gustavohdab/rettiwt-backend/blob/main/README.md) to provide a Twitter-like user experience.
 
 ## Features
 
