@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import TweetList from '@/components/tweet/TweetList';
 import TweetSkeleton from '@/components/tweet/TweetSkeleton';
+import Header from '@/components/layout/Header';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 export default function FeedPage() {
     return (
         <div>
-            <h1 className="text-xl font-bold p-4 border-b border-gray-200 dark:border-gray-800">Home</h1>
+            <Header title="Home" showSearch={false} />
 
             {/* Tweet composer and timeline are managed together in TweetList */}
             <Suspense fallback={

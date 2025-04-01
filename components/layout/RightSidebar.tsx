@@ -1,4 +1,5 @@
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import SearchInput from '../search/SearchInput';
 
 // This is a Server Component - it can fetch data directly
 export default async function RightSidebar() {
@@ -21,14 +22,7 @@ export default async function RightSidebar() {
         <div className="hidden lg:block w-[350px] h-screen overflow-y-auto px-4 py-4 sticky top-0">
             {/* Search Bar */}
             <div className="relative mb-6">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                </div>
-                <input
-                    type="text"
-                    className="block w-full bg-gray-100 dark:bg-gray-800 border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-gray-100 placeholder-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Search Twitter"
-                />
+                <SearchInput />
             </div>
 
             {/* Trends */}

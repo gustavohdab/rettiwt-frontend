@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
     HomeIcon,
-    HashtagIcon,
+    MagnifyingGlassIcon,
     BellIcon,
     EnvelopeIcon,
     UserIcon,
@@ -13,11 +13,14 @@ import {
     EllipsisHorizontalCircleIcon,
     ArrowLeftOnRectangleIcon
 } from '@heroicons/react/24/outline';
-import { HomeIcon as HomeIconSolid } from '@heroicons/react/24/solid';
+import {
+    HomeIcon as HomeIconSolid,
+    MagnifyingGlassIcon as MagnifyingGlassIconSolid
+} from '@heroicons/react/24/solid';
 
 const navigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
-    { name: 'Explore', href: '/explore', icon: HashtagIcon },
+    { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
     { name: 'Notifications', href: '/notifications', icon: BellIcon },
     { name: 'Messages', href: '/messages', icon: EnvelopeIcon },
     { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon },

@@ -30,8 +30,7 @@ export default function Navigation({ isOpen, setIsOpen }: NavigationProps) {
     // Reduced navigation items for mobile to avoid overcrowding
     const navigationItems = [
         { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
-        { name: 'Explore', href: '/explore', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
-        { name: 'Notifications', href: '/notifications', icon: BellIcon, activeIcon: BellIconSolid },
+        { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
         { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon, activeIcon: BookmarkIconSolid },
         { name: 'Profile', href: '/profile', icon: UserIcon, activeIcon: UserIconSolid },
     ];
