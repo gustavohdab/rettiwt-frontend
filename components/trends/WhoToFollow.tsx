@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import FollowButton from "@/components/profile/FollowButton";
+import { Skeleton } from "@/components/ui/skeleton";
+import trendsService from "@/lib/api/services/trends.service";
+import { useAuth } from "@/lib/hooks/useAuth";
+import getImageUrl from "@/lib/utils/getImageUrl";
+import { RecommendedUser } from "@/types/models";
 import Image from "next/image";
 import Link from "next/link";
-import { RecommendedUser } from "@/types/models";
-import trendsService from "@/lib/api/services/trends.service";
-import { Skeleton } from "@/components/ui/skeleton";
-import FollowButton from "@/components/profile/FollowButton";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 interface WhoToFollowProps {
     initialUsers?: RecommendedUser[];
@@ -81,21 +82,26 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
         );
     }
 
+
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
             <h2 className="text-xl font-bold mb-4">Who to follow</h2>
             <div className="space-y-4">
                 {users.map((user) => (
                     <div key={user._id} className="flex items-center gap-3">
-                        <Link href={`/${user.username}`}>
-                            <Image
-                                src={user.avatar || "/placeholder-avatar.png"}
-                                alt={user.name}
-                                width={48}
-                                height={48}
-                                className="rounded-full"
-                            />
-                        </Link>
+                        <div className="flex-shrink-0 mr-2">
+                            <Link href={`/${user.username}`}>
+                                <div className="w-10 h-10 rounded-full overflow-hidden">
+                                    <Image
+                                        src={getImageUrl(user.avatar)}
+                                        alt={user.name || user.username}
+                                        width={40}
+                                        height={40}
+                                        className="object-cover"
+                                    />
+                                </div>
+                            </Link>
+                        </div>
                         <div className="flex-1 min-w-0">
                             <Link href={`/${user.username}`} className="hover:underline">
                                 <h3 className="font-semibold text-sm truncate">{user.name}</h3>

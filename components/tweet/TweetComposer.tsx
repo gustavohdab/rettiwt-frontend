@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef, useTransition } from 'react';
-import { useSession } from 'next-auth/react';
-import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { createTweet } from '@/lib/actions/tweet.actions';
 import { uploadTweetMedia } from '@/lib/actions/upload.actions';
-import { Media, TweetComposerProps } from '@/types';
+import getImageUrl from '@/lib/utils/getImageUrl';
+import { TweetComposerProps } from '@/types';
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useRef, useState, useTransition } from 'react';
 
 export default function TweetComposer({ placeholder = "What's happening?", parentId, onSuccess }: TweetComposerProps = {}) {
     const { data: session } = useSession();
@@ -19,6 +20,7 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -135,7 +137,7 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                     <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
                         {session.user.image ? (
                             <Image
-                                src={session.user.image}
+                                src={getImageUrl(session.user.image)}
                                 alt={session.user.name || 'User'}
                                 width={48}
                                 height={48}

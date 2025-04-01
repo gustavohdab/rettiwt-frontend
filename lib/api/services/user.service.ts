@@ -82,12 +82,17 @@ const UserService = {
      * @param profileData Profile data to update
      */
     updateProfile: async (
-        profileData: ApiTypes.UpdateProfileRequest
+        profileData: ApiTypes.UpdateProfileRequest,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<{ user: User }>> => {
         try {
+            const config = accessToken
+                ? { headers: { Authorization: `Bearer ${accessToken}` } }
+                : undefined;
+
             const response = await api.patch<
                 ApiTypes.ApiResponse<{ user: ApiTypes.User }>
-            >("/users/profile", profileData);
+            >("/users/profile", profileData, config);
 
             // Transform API response to UI model
             if (

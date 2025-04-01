@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useRef, useTransition } from 'react';
-import { useSession } from 'next-auth/react';
-import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
 import { createReply } from '@/lib/actions/tweet.actions';
 import { uploadTweetMedia } from '@/lib/actions/upload.actions';
+import getImageUrl from '@/lib/utils/getImageUrl';
 import type { Tweet } from '@/types';
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import { useRef, useState, useTransition } from 'react';
 
 interface ReplyComposerProps {
     parentTweet: Tweet;
@@ -24,6 +25,7 @@ export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = fals
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
 
     // Auto focus the textarea if needed
     if (autoFocus && textareaRef.current) {
@@ -142,7 +144,7 @@ export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = fals
                     <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
                         {session.user.image ? (
                             <Image
-                                src={session.user.image}
+                                src={getImageUrl(session.user.image)}
                                 alt={session.user.name || 'User'}
                                 width={40}
                                 height={40}

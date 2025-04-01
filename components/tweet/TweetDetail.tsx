@@ -1,10 +1,13 @@
-import { formatDistanceToNow } from 'date-fns';
-import Link from 'next/link';
-import Image from 'next/image';
-import type { Tweet } from '@/types';
+'use client';
+
 import LikeButton from '@/components/tweet/LikeButton';
 import RetweetButton from '@/components/tweet/RetweetButton';
+import getImageUrl from '@/lib/utils/getImageUrl';
+import type { Tweet } from '@/types';
 import { ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface TweetDetailProps {
     tweet: Tweet;
@@ -12,8 +15,15 @@ interface TweetDetailProps {
 }
 
 export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) {
-    const formattedDate = formatDistanceToNow(new Date(tweet.createdAt), { addSuffix: true });
-    const fullDate = new Date(tweet.createdAt).toLocaleDateString('en-US', {
+    // Destructuring for easier access
+    const {
+        author,
+        content: text,
+        createdAt,
+    } = tweet;
+
+    const formattedDate = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
+    const fullDate = new Date(createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -25,19 +35,19 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
         <article className="p-4 border-b border-gray-200 dark:border-gray-800">
             {/* Author info with follow button */}
             <div className="flex items-start mb-4">
-                <Link href={`/${tweet.author.username}`} className="flex-shrink-0 mr-3">
+                <Link href={`/${author.username}`} className="flex-shrink-0 mr-3">
                     <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
-                        {tweet.author.avatar ? (
+                        {author.avatar ? (
                             <Image
-                                src={tweet.author.avatar}
-                                alt={tweet.author.name || 'User avatar'}
+                                src={getImageUrl(author.avatar)}
+                                alt={author.name || 'User avatar'}
                                 width={48}
                                 height={48}
                                 className="rounded-full"
                             />
                         ) : (
                             <span className="text-gray-500 text-sm font-medium">
-                                {tweet.author.name?.charAt(0).toUpperCase() || 'U'}
+                                {author.name?.charAt(0).toUpperCase() || 'U'}
                             </span>
                         )}
                     </div>
@@ -46,22 +56,22 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
                 <div className="flex-1">
                     <div className="flex flex-col">
                         <Link
-                            href={`/${tweet.author.username}`}
+                            href={`/${author.username}`}
                             className="font-bold hover:underline"
                         >
-                            {tweet.author.name}
+                            {author.name}
                         </Link>
                         <Link
-                            href={`/${tweet.author.username}`}
+                            href={`/${author.username}`}
                             className="text-gray-500"
                         >
-                            @{tweet.author.username}
+                            @{author.username}
                         </Link>
                     </div>
                 </div>
 
                 {/* Follow button would go here if not the current user */}
-                {tweet.author._id !== currentUserId && (
+                {author._id !== currentUserId && (
                     <button className="px-4 py-1 rounded-full border border-gray-300 hover:bg-gray-100 transition dark:border-gray-700 dark:hover:bg-gray-800">
                         Follow
                     </button>
@@ -70,21 +80,23 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
 
             {/* Tweet content */}
             <div className="mb-4 text-xl">
-                {tweet.content}
+                {text}
             </div>
 
             {/* Media if present */}
             {tweet.media && tweet.media.length > 0 && (
-                <div className={`grid gap-2 mb-4 ${tweet.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {tweet.media.map((media, index) => (
-                        <div key={index} className="rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                            <Image
-                                src={`http://localhost:5000${media.url}`}
-                                alt={media.altText || "Tweet image"}
-                                width={500}
-                                height={300}
-                                className="w-full h-auto object-cover"
-                            />
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {tweet.media.map((item: { id?: string, url: string, altText?: string }, index: number) => (
+                        <div key={item.id || index} className="rounded-lg overflow-hidden">
+                            {item.url && (
+                                <Image
+                                    src={getImageUrl(item.url)}
+                                    alt={item.altText || `Image ${index + 1}`}
+                                    width={800}
+                                    height={450}
+                                    className="w-full h-auto object-cover"
+                                />
+                            )}
                         </div>
                     ))}
                 </div>
@@ -92,7 +104,7 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
 
             {/* Posted time */}
             <div className="text-gray-500 mb-4">
-                <time dateTime={tweet.createdAt} title={fullDate}>
+                <time dateTime={createdAt} title={fullDate}>
                     {fullDate}
                 </time>
             </div>

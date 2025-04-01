@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import UserService from "@/lib/api/services/user.service";
 import { revalidatePath } from "next/cache";
+import { UpdateProfileParams } from "@/types/actions";
 
 /**
  * Follow a user
@@ -98,5 +99,46 @@ export async function unfollowUser(username: string) {
     } catch (error) {
         console.error("Error in unfollowUser action:", error);
         return { success: false, error: String(error) };
+    }
+}
+
+/**
+ * Update user profile
+ * @param data Profile data to update
+ */
+export async function updateProfile(data: UpdateProfileParams) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.accessToken) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        const response = await UserService.updateProfile(
+            {
+                name: data.name,
+                bio: data.bio,
+                location: data.location,
+                website: data.website,
+            },
+            session.accessToken
+        );
+
+        if (response.status === "success") {
+            // Revalidate paths to show updated profile data
+            if (session.user?.username) {
+                revalidatePath(`/${session.user.username}`);
+                revalidatePath(`/${session.user.username}/edit`);
+            }
+            return { success: true };
+        } else {
+            console.error("API returned error for profile update:", response);
+            return {
+                success: false,
+                error: response.message || "Failed to update profile",
+            };
+        }
+    } catch (error) {
+        console.error("Error in updateProfile action:", error);
+        return { success: false, error: "An unexpected error occurred" };
     }
 }

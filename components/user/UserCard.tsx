@@ -1,8 +1,9 @@
 'use client';
 
+import getImageUrl from '@/lib/utils/getImageUrl';
+import { User } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User } from '@/types';
 
 interface UserCardProps {
     user: User;
@@ -18,7 +19,7 @@ export default function UserCard({ user, currentUserId }: UserCardProps) {
             >
                 <div className="flex-shrink-0">
                     <Image
-                        src={user.avatar || '/default-avatar.png'}
+                        src={getImageUrl(user.avatar)}
                         alt={user.name}
                         width={48}
                         height={48}

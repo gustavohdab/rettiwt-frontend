@@ -2,6 +2,7 @@
 
 import { followUser, unfollowUser } from "@/lib/actions/user.actions";
 import { formatDateToMonthYear } from "@/lib/utils/dateUtils";
+import getImageUrl from "@/lib/utils/getImageUrl";
 import { User } from "@/types/models";
 import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -58,7 +59,7 @@ export default function ProfileHeader({
             <div className="h-48 bg-blue-100 dark:bg-blue-900 relative">
                 {user.headerImage && (
                     <Image
-                        src={user.headerImage}
+                        src={getImageUrl(user.headerImage)}
                         alt={`${user.name}'s cover`}
                         fill
                         className="object-cover"
@@ -69,13 +70,13 @@ export default function ProfileHeader({
             {/* Profile header */}
             <div className="px-4 py-3 relative">
                 {/* Avatar */}
-                <div className="absolute -top-16 left-4 border-4 border-white dark:border-black rounded-full bg-white dark:bg-black">
+                <div className="absolute -top-16 left-4 border-4 border-white dark:border-black rounded-full bg-white dark:bg-black overflow-hidden w-32 h-32">
                     <Image
-                        src={user.avatar || "/placeholder-avatar.png"}
+                        src={getImageUrl(user.avatar)}
                         alt={user.name}
                         width={128}
                         height={128}
-                        className="rounded-full h-32 w-32"
+                        className="w-full h-full object-cover"
                     />
                 </div>
 

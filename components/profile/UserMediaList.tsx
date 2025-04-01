@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Tweet } from "@/types/models";
-import { ApiTypes } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import TweetService from "@/lib/api/services/tweet.service";
+import getImageUrl from "@/lib/utils/getImageUrl";
+import { ApiTypes } from "@/types";
+import { Tweet } from "@/types/models";
+import Image from "next/image";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UserMediaListProps {
     username: string;
@@ -107,6 +108,7 @@ export default function UserMediaList({
         }))
     );
 
+
     return (
         <div className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -118,7 +120,7 @@ export default function UserMediaList({
                     >
                         <Link href={`/tweet/${item.tweet._id}`}>
                             <Image
-                                src={`${process.env.NEXT_PUBLIC_API_URL_MEDIA}${item.mediaItem.url}`}
+                                src={getImageUrl(item.mediaItem.url)}
                                 alt={item.mediaItem.altText || "Media"}
                                 fill
                                 className="object-cover hover:scale-105 transition-transform duration-200"

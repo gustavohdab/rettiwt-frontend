@@ -1,18 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
-import { HeartIcon, ArrowPathRoundedSquareIcon, ChatBubbleOvalLeftIcon, ArrowUpTrayIcon, EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
-import { useRouter } from 'next/navigation';
-import { likeTweet, unlikeTweet, retweetTweet, unretweetTweet } from '@/lib/actions/tweet.actions';
+import { likeTweet, retweetTweet, unlikeTweet, unretweetTweet } from '@/lib/actions/tweet.actions';
+import getImageUrl from '@/lib/utils/getImageUrl';
 import type { TweetCardProps } from '@/types';
+import { ArrowPathRoundedSquareIcon, ArrowUpTrayIcon, ChatBubbleOvalLeftIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import BookmarkButton from './BookmarkButton';
 
 export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCardProps) {
     const router = useRouter();
+    const displayTweet = tweet.isRetweet && tweet.originalTweet ? tweet.originalTweet : tweet;
+    const isRetweet = tweet.isRetweet;
+    const formattedDate = formatDistanceToNow(new Date(displayTweet.createdAt), { addSuffix: true });
+    const [isPending, startTransition] = useTransition();
 
     // State for optimistic UI updates
     const [isLiked, setIsLiked] = useState(tweet.liked || Array.isArray(tweet.likes) && tweet.likes.some(like =>
@@ -61,7 +65,6 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
     };
 
     // For retweets, use the original tweet content but show who retweeted it
-    const displayTweet = tweet.isRetweet && tweet.originalTweet ? tweet.originalTweet : tweet;
     const author = displayTweet.author;
 
     // Navigate to tweet detail page
@@ -116,11 +119,11 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     >
                         {author.avatar ? (
                             <Image
-                                src={author.avatar}
+                                src={getImageUrl(author.avatar)}
                                 alt={author.name}
                                 width={64}
                                 height={64}
-                                className="rounded-full"
+                                className="rounded-full w-full h-full object-cover"
                             />
                         ) : (
                             <span className="text-gray-500 text-sm sm:text-base lg:text-lg font-medium">
@@ -128,6 +131,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                             </span>
                         )}
                     </div>
+
                 </div>
 
                 {/* Tweet content */}
@@ -155,7 +159,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                         </span>
                         <span className="mx-1 text-gray-500 dark:text-gray-400">·</span>
                         <span className="text-gray-500 dark:text-gray-400 hover:underline text-sm sm:text-base">
-                            {formatDistanceToNow(new Date(displayTweet.createdAt), { addSuffix: true })}
+                            {formattedDate}
                         </span>
                     </div>
 
@@ -165,29 +169,23 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     </div>
 
                     {/* Tweet images */}
-                    {(() => {
-                        const media = displayTweet?.media || [];
-                        if (media.length > 0) {
-                            return (
-                                <div className={`grid ${media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2 sm:gap-3 mb-3 sm:mb-4 rounded-xl overflow-hidden`}>
-                                    {media.map((item, index) => (
-                                        <div key={index} className="relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                            {item.url && (
-                                                <Image
-                                                    src={`http://localhost:5000${item.url}`}
-                                                    alt={item.altText || `Image ${index + 1}`}
-                                                    width={500}
-                                                    height={media.length === 1 ? 300 : 200}
-                                                    className="object-cover w-full"
-                                                />
-                                            )}
-                                        </div>
-                                    ))}
+                    {displayTweet.media && displayTweet.media.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                            {displayTweet.media.map((item, index) => (
+                                <div key={index} className="relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                    {item.url && (
+                                        <Image
+                                            src={getImageUrl(item.url)}
+                                            alt={item.altText || `Image ${index + 1}`}
+                                            width={500}
+                                            height={300}
+                                            className="w-full h-auto object-cover"
+                                        />
+                                    )}
                                 </div>
-                            );
-                        }
-                        return null;
-                    })()}
+                            ))}
+                        </div>
+                    )}
 
                     {/* Tweet actions */}
                     <div className="flex justify-between mt-2 sm:mt-3 text-gray-500 dark:text-gray-400">
