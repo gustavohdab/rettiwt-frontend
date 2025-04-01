@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import PopularTweets from "@/components/trends/PopularTweets";
 
 export const metadata: Metadata = {
-    title: "Explore | Twitter Clone",
-    description: "Discover what's happening on Twitter right now",
+    title: "Explore | Rettiwt",
+    description: "Discover what's happening on Rettiwt right now",
 };
 
 export default function ExplorePage() {

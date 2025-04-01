@@ -16,8 +16,8 @@ interface FollowingPageProps {
 export async function generateMetadata({ params }: FollowingPageProps): Promise<Metadata> {
     const { username } = await params;
     return {
-        title: `People @${username} follows | Twitter Clone`,
-        description: `People who @${username} follows on Twitter Clone`,
+        title: `People @${username} follows | Rettiwt`,
+        description: `People who @${username} follows on Rettiwt`,
     };
 }
 

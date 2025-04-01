@@ -3,8 +3,8 @@ import TweetWithReplies from '@/components/tweet/TweetWithReplies';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Tweet / Twitter Clone',
-    description: 'View and reply to this tweet',
+    title: 'Tweet / Rettiwt',
+    description: 'View tweet and replies',
 };
 
 interface TweetPageProps {

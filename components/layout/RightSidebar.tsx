@@ -27,7 +27,7 @@ export default function RightSidebar() {
             {/* Footer */}
             <div className="mt-4 px-4 text-xs text-[var(--secondary)]">
                 <span>
-                    &copy; {new Date().getFullYear()} Twitter Clone by <Link href="https://github.com/gustavohdab" className="hover:underline text-[var(--accent)]">Gustavo Batista</Link>
+                    &copy; {new Date().getFullYear()} Rettiwt by <Link href="https://github.com/gustavohdab" className="hover:underline text-[var(--accent)]">Gustavo Batista</Link>
                 </span>
             </div>
         </div>

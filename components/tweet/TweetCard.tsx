@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import BookmarkButton from './BookmarkButton';
 import TweetContent from './TweetContent';
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCardProps) {
     const router = useRouter();
@@ -32,6 +33,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
     const [retweetCount, setRetweetCount] = useState(
         tweet.engagementCount?.retweets || (Array.isArray(tweet.retweets) ? tweet.retweets.length : 0)
     );
+    const [showCopiedTooltip, setShowCopiedTooltip] = useState(false);
 
     // Handle like/unlike
     const handleLike = async (e: React.MouseEvent) => {
@@ -77,6 +79,29 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
     const navigateToProfile = (e: React.MouseEvent, username: string) => {
         e.stopPropagation(); // Prevent navigation to tweet detail
         router.push(`/${username}`);
+    };
+
+    // Handle share button click - copy URL to clipboard
+    const handleShare = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        // Create the tweet URL
+        const tweetUrl = `${window.location.origin}/tweet/${tweet._id}`;
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(tweetUrl)
+            .then(() => {
+                // Show tooltip
+                setShowCopiedTooltip(true);
+
+                // Hide tooltip after 2 seconds
+                setTimeout(() => {
+                    setShowCopiedTooltip(false);
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy URL: ', err);
+            });
     };
 
     return (
@@ -228,12 +253,23 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                         />
 
                         {/* Share */}
-                        <button
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center hover:text-[var(--accent)] transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a]"
-                        >
-                            <ArrowUpTrayIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={handleShare}
+                                className="flex items-center hover:text-[var(--accent)] transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a]"
+                            >
+                                {showCopiedTooltip ? (
+                                    <CheckIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--accent)]" />
+                                ) : (
+                                    <ArrowUpTrayIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                )}
+                            </button>
+                            {showCopiedTooltip && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-[var(--accent)] text-white text-xs rounded whitespace-nowrap">
+                                    Copied to clipboard!
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

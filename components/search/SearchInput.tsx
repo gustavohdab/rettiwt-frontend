@@ -41,7 +41,7 @@ export default function SearchInput({ initialQuery = '', showRecentSearches = tr
     };
 
     return (
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full">
             <form onSubmit={handleSearch}>
                 <div className="relative flex items-center">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -50,12 +50,12 @@ export default function SearchInput({ initialQuery = '', showRecentSearches = tr
                     <input
                         ref={inputRef}
                         type="text"
-                        placeholder="Search Twitter"
+                        placeholder="Search Rettiwt"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => {
-                            // Delayed blur to allow clicking on recent searches
+                            // Delay para permitir clique em pesquisas recentes
                             setTimeout(() => setIsFocused(false), 200);
                         }}
                         className="w-full py-3 pl-12 pr-12 bg-gray-800 border border-transparent rounded-full focus:outline-none focus:bg-gray-900 focus:border-gray-700 transition-colors"

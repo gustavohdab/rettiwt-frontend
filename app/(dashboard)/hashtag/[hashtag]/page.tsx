@@ -12,7 +12,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { hashtag } = await params;
     return {
-        title: `#${hashtag} | Twitter Clone`,
+        title: `#${hashtag} | Rettiwt`,
         description: `Explore tweets with the hashtag #${hashtag}`,
     };
 }

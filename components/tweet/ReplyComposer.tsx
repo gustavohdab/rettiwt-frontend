@@ -141,14 +141,14 @@ export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = fals
             <div className="flex">
                 {/* User avatar */}
                 <div className="flex-shrink-0 mr-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
                         {session.user.image ? (
                             <Image
                                 src={getImageUrl(session.user.image)}
                                 alt={session.user.name || 'User'}
                                 width={40}
                                 height={40}
-                                className="rounded-full"
+                                className="rounded-full object-cover w-full h-full"
                             />
                         ) : (
                             <span className="text-gray-500 text-sm font-medium">

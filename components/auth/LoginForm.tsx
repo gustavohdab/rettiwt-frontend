@@ -39,7 +39,7 @@ const LoginForm = () => {
     return (
         <div className="flex flex-col items-center justify-center w-full max-w-md p-6 mx-auto">
             <div className="mb-8 text-center">
-                <h1 className="text-3xl font-bold">Log in to Twitter</h1>
+                <h1 className="text-3xl font-bold">Log in to Rettiwt</h1>
             </div>
 
             {error && (

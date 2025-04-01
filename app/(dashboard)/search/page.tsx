@@ -19,8 +19,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
     const params = await searchParams;
     return {
         title: params.q
-            ? `${params.q} - Search / Twitter Clone`
-            : 'Search / Twitter Clone',
+            ? `${params.q} - Search / Rettiwt`
+            : 'Search / Rettiwt',
         description: 'Search for users and tweets',
     };
 }

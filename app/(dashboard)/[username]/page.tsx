@@ -19,20 +19,29 @@ export async function generateMetadata({
     params,
 }: ProfilePageProps): Promise<Metadata> {
     const { username } = await params;
-    const userResponse = await UserService.getUserProfile(username);
 
-    if (userResponse.status !== "success" || !userResponse.data?.user) {
+    try {
+        const userResponse = await UserService.getUserProfile(username);
+
+        if (userResponse.status !== "success" || !userResponse.data?.user) {
+            return {
+                title: 'User not found | Rettiwt',
+                description: 'The user you are looking for does not exist',
+            };
+        }
+
+        const { user } = userResponse.data;
+
         return {
-            title: "User not found",
+            title: `${user.name} (@${user.username}) | Rettiwt`,
+            description: user.bio || `Check out ${user.name}'s profile on Rettiwt`,
+        };
+    } catch (error) {
+        return {
+            title: 'Error | Rettiwt',
+            description: 'An error occurred while loading this profile',
         };
     }
-
-    const { user } = userResponse.data;
-
-    return {
-        title: `${user.name} (@${user.username}) | Twitter Clone`,
-        description: user.bio || `Check out ${user.name}'s profile on Twitter Clone`,
-    };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {

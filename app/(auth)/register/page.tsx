@@ -2,8 +2,8 @@ import RegisterForm from '@/components/auth/RegisterForm';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Register | Twitter Clone',
-    description: 'Create a new Twitter Clone account',
+    title: 'Register | Rettiwt',
+    description: 'Create a new Rettiwt account',
 };
 
 export default function RegisterPage() {

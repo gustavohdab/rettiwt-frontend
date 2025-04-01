@@ -10,8 +10,8 @@ import { Metadata } from 'next';
 import BackButton from '@/components/shared/BackButton';
 
 export const metadata: Metadata = {
-    title: 'Bookmarks / Twitter Clone',
-    description: 'Your bookmarked tweets',
+    title: 'Bookmarks / Rettiwt',
+    description: 'Your saved tweets',
 };
 
 export default async function BookmarksPage() {

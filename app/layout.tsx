@@ -6,7 +6,7 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Twitter Clone",
+  title: "Rettiwt",
   description: "A Twitter clone built with Next.js and React",
 };
 

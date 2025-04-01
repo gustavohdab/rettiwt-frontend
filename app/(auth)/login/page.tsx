@@ -2,8 +2,8 @@ import LoginForm from '@/components/auth/LoginForm';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Login | Twitter Clone',
-    description: 'Log in to your Twitter Clone account',
+    title: 'Login | Rettiwt',
+    description: 'Log in to your Rettiwt account',
 };
 
 export default function LoginPage() {

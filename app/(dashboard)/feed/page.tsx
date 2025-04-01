@@ -5,7 +5,7 @@ import Header from '@/components/layout/Header';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Home / Twitter Clone',
+    title: 'Home / Rettiwt',
     description: 'See what\'s happening in the world right now',
 };
 

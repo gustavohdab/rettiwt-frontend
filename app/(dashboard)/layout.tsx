@@ -4,7 +4,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Twitter Clone",
+    title: "Rettiwt",
     description: "A Twitter clone built with Next.js and React",
 };
 
