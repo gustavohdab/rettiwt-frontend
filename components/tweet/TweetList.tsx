@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import TweetService from '@/lib/api/services/tweet.service';
 import TimelineWithComposer from '@/components/feed/TimelineWithComposer';
-import type { Tweet } from '@/types';
+import TweetService from '@/lib/api/services/tweet.service';
+import { authOptions } from '@/lib/auth';
+import { getServerSession } from 'next-auth';
 
 // This is a Server Component that fetches the initial data
 export default async function TweetList() {

@@ -1,9 +1,8 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import RepliesList from '@/components/tweet/RepliesList';
 import ReplyComposer from '@/components/tweet/ReplyComposer';
 import TweetDetail from '@/components/tweet/TweetDetail';
 import TweetService from '@/lib/api/services/tweet.service';
-import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';

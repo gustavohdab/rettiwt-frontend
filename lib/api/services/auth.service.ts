@@ -5,8 +5,7 @@ import {
     LoginRequest,
     RegisterRequest,
     User,
-} from "@/lib/api/types";
-
+} from "@/types/api";
 /**
  * Auth service for handling authentication API endpoints
  */

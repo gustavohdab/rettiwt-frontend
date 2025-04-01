@@ -1,18 +1,15 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import TweetService from "@/lib/api/services/tweet.service";
+import { authOptions } from "@/lib/auth";
 import type {
     CreateTweetParams,
-    TweetActionResponse,
-    LikeActionResponse,
-    RetweetActionResponse,
-    Tweet,
     Media,
     ReplyActionParams,
+    TweetActionResponse,
 } from "@/types";
+import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 // Helper function to determine media type based on URL
 function determineMediaType(url: string): "image" | "video" | "gif" {

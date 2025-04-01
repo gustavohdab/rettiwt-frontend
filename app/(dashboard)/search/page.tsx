@@ -1,11 +1,11 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Suspense } from 'react';
-import SearchService from '@/lib/api/services/search.service';
-import SearchTabs from '@/components/search/SearchTabs';
-import SearchResults from '@/components/search/SearchResults';
 import SearchInput from '@/components/search/SearchInput';
+import SearchResults from '@/components/search/SearchResults';
+import SearchTabs from '@/components/search/SearchTabs';
+import SearchService from '@/lib/api/services/search.service';
+import { authOptions } from '@/lib/auth';
 import { Metadata } from 'next';
+import { getServerSession } from 'next-auth';
+import { Suspense } from 'react';
 
 interface SearchPageProps {
     searchParams: Promise<{

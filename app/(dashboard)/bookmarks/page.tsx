@@ -1,13 +1,12 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import TweetService from '@/lib/api/services/tweet.service';
+import BackButton from '@/components/shared/BackButton';
 import TweetCard from '@/components/tweet/TweetCard';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import TweetService from '@/lib/api/services/tweet.service';
+import { authOptions } from '@/lib/auth';
 import { BookmarkIcon } from '@heroicons/react/24/outline';
 import { Metadata } from 'next';
-import BackButton from '@/components/shared/BackButton';
+import { getServerSession } from 'next-auth';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
     title: 'Bookmarks / Rettiwt',
