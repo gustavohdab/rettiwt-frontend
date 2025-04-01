@@ -17,7 +17,7 @@ export default function AppShell({ children }: AppShellProps) {
     // Show consistent loading layout to prevent shift
     if (status === 'loading') {
         return (
-            <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
                 <LoadingSpinner />
             </div>
         );
@@ -29,9 +29,9 @@ export default function AppShell({ children }: AppShellProps) {
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-900">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
             {/* Mobile navigation - fixed at bottom on mobile */}
-            <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-10">
+            <div className="fixed bottom-0 left-0 right-0 md:hidden bg-[var(--background)] border-t border-gray-800 z-10">
                 <Navigation isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
             </div>
 

@@ -19,16 +19,16 @@ export default function Header({ title, showBackButton = false, showSearch = tru
     const shouldShowSearch = showSearch && !pathname?.startsWith('/search');
 
     return (
-        <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 bg-opacity-80 dark:bg-opacity-80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+        <header className="sticky top-0 z-10 bg-[var(--background)] bg-opacity-90 backdrop-blur-sm border-b border-gray-800 px-5 py-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                     {showBackButton && (
-                        <button onClick={() => window.history.back()} className="mr-4">
-                            <ArrowLeftIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                        <button onClick={() => window.history.back()} className="mr-5 p-1.5 rounded-full hover:bg-gray-800 transition-colors">
+                            <ArrowLeftIcon className="h-5 w-5 text-[var(--secondary)]" />
                         </button>
                     )}
                     {title && (
-                        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>
+                        <h1 className="text-xl font-bold text-[var(--foreground)]">{title}</h1>
                     )}
                 </div>
 

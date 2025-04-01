@@ -45,8 +45,9 @@ export default function BookmarkButton({ tweetId, initialBookmarked = false }: B
         <button
             onClick={handleBookmark}
             disabled={isLoading}
-            className={`flex items-center transition duration-150 p-1 sm:p-2 rounded-full 
-                ${isBookmarked ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20' : 'text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'} 
+            className={`flex items-center transition duration-150 p-2 rounded-full 
+                ${isBookmarked ? 'text-[var(--accent)]' : 'text-[var(--secondary)]'} 
+                hover:bg-[#1a1a1a] 
                 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark tweet'}
             title={isBookmarked ? 'Remove bookmark' : 'Bookmark tweet'}

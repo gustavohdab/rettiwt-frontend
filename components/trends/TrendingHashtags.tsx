@@ -39,12 +39,12 @@ export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsPr
 
     if (loading) {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
-                <h2 className="text-xl font-bold mb-4">Trending</h2>
+            <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
+                <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Trending</h2>
                 {[...Array(5)].map((_, i) => (
-                    <div key={i} className="mb-3">
-                        <Skeleton className="h-5 w-24 mb-1" />
-                        <Skeleton className="h-4 w-16" />
+                    <div key={i} className="mb-4">
+                        <Skeleton className="h-5 w-24 mb-2 bg-gray-800" />
+                        <Skeleton className="h-4 w-16 bg-gray-800" />
                     </div>
                 ))}
             </div>
@@ -53,8 +53,8 @@ export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsPr
 
     if (error) {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
-                <h2 className="text-xl font-bold mb-4">Trending</h2>
+            <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
+                <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Trending</h2>
                 <p className="text-red-500">Failed to load trending hashtags</p>
             </div>
         );
@@ -62,25 +62,25 @@ export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsPr
 
     if (!hashtags.length) {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
-                <h2 className="text-xl font-bold mb-4">Trending</h2>
-                <p className="text-gray-500">No trending hashtags at the moment</p>
+            <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
+                <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Trending</h2>
+                <p className="text-[var(--secondary)]">No trending hashtags at the moment</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
-            <h2 className="text-xl font-bold mb-4">Trending</h2>
-            <div className="space-y-3">
+        <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
+            <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Trending</h2>
+            <div className="space-y-4">
                 {hashtags.map((tag) => (
                     <Link
                         href={`/hashtag/${tag.hashtag}`}
                         key={tag.hashtag}
-                        className="block hover:bg-gray-100 dark:hover:bg-gray-700 -mx-3 px-3 py-2 rounded-md transition"
+                        className="block hover:bg-[#1a1a1a] -mx-3 px-3 py-2.5 rounded-md transition"
                     >
-                        <div className="font-semibold text-base">#{tag.hashtag}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="font-semibold text-base text-[var(--foreground)]">#{tag.hashtag}</div>
+                        <div className="text-sm text-[var(--secondary)]">
                             {tag.tweetCount} {tag.tweetCount === 1 ? "tweet" : "tweets"}
                         </div>
                     </Link>
@@ -88,7 +88,7 @@ export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsPr
             </div>
             <Link
                 href="/explore"
-                className="block text-blue-500 hover:text-blue-600 text-sm mt-3 font-medium"
+                className="block text-white hover:text-gray-200 text-sm mt-4 font-medium bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-center transition"
             >
                 Show more
             </Link>

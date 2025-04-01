@@ -10,7 +10,7 @@ export default async function TweetList() {
 
     if (!session?.user?.id) {
         return (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-[var(--secondary)]">
                 Please sign in to view your timeline.
             </div>
         );
@@ -23,7 +23,7 @@ export default async function TweetList() {
 
         if (timelineResponse.status !== 'success' || !timelineResponse.data) {
             return (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-[var(--secondary)]">
                     Failed to load tweets. Please try again later.
                 </div>
             );
@@ -42,7 +42,7 @@ export default async function TweetList() {
     } catch (error) {
         console.error('Error loading timeline:', error);
         return (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-[var(--secondary)]">
                 An error occurred while loading tweets. Please try again later.
             </div>
         );

@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #ffffff;
+  --secondary: #a1a1a1;
+  --accent: #38bdf8;
+  --button-bg: #ffffff;
+  --button-text: #171717;
+  --button-border: #ffffff;
 }
 
 @theme inline {
@@ -16,11 +22,48 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #ffffff;
+    --secondary: #a1a1a1;
+    --accent: #38bdf8;
+    --button-bg: #ffffff;
+    --button-text: #0a0a0a;
+    --button-border: #ffffff;
   }
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(to top, #0a0a0a, #121212, #1a1a1a);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Botões */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+}
+
+.btn-primary:hover {
+  opacity: 0.8;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--button-bg);
+  border: 2px solid var(--button-border);
+}
+
+.btn-outline:hover {
+  background: var(--button-bg);
+  color: var(--button-text);
 }

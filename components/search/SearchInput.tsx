@@ -44,8 +44,8 @@ export default function SearchInput({ initialQuery = '', showRecentSearches = tr
         <div className="relative w-full max-w-md">
             <form onSubmit={handleSearch}>
                 <div className="relative flex items-center">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <MagnifyingGlassIcon className="h-5 w-5 text-[var(--secondary)]" />
                     </div>
                     <input
                         ref={inputRef}
@@ -58,43 +58,43 @@ export default function SearchInput({ initialQuery = '', showRecentSearches = tr
                             // Delayed blur to allow clicking on recent searches
                             setTimeout(() => setIsFocused(false), 200);
                         }}
-                        className="w-full py-2 pl-10 pr-10 bg-gray-100 dark:bg-gray-800 border border-transparent rounded-full focus:outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-blue-500 transition-colors"
+                        className="w-full py-3 pl-12 pr-12 bg-gray-800 border border-transparent rounded-full focus:outline-none focus:bg-gray-900 focus:border-gray-700 transition-colors"
                     />
                     {query && (
                         <button
                             type="button"
                             onClick={clearSearch}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
                         >
-                            <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                            <XMarkIcon className="h-5 w-5 text-white hover:text-gray-200" />
                         </button>
                     )}
                 </div>
             </form>
 
             {showRecentSearches && isFocused && recentSearches.length > 0 && (
-                <div className="absolute mt-1 w-full bg-white dark:bg-gray-900 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
-                    <div className="p-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300">Recent searches</h3>
+                <div className="absolute mt-2 w-full bg-[var(--background)] rounded-md shadow-lg z-10 border border-gray-800">
+                    <div className="p-3 border-b border-gray-800 flex justify-between items-center">
+                        <h3 className="text-sm font-semibold text-[var(--secondary)]">Recent searches</h3>
                         <button
                             onClick={clearRecentSearches}
-                            className="text-xs text-blue-500 hover:text-blue-600 hover:underline"
+                            className="text-xs text-white hover:text-gray-200 px-3 py-1 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors"
                         >
                             Clear all
                         </button>
                     </div>
                     <ul>
                         {recentSearches.map((search, index) => (
-                            <li key={index} className="flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <li key={index} className="flex items-center justify-between hover:bg-gray-800">
                                 <button
                                     onClick={() => handleSearchClick(search)}
-                                    className="p-3 text-left w-full text-sm text-gray-700 dark:text-gray-300"
+                                    className="p-3 text-left w-full text-sm text-[var(--foreground)]"
                                 >
                                     {search}
                                 </button>
                                 <button
                                     onClick={() => removeRecentSearch(search)}
-                                    className="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                    className="p-3 text-white hover:text-gray-200"
                                 >
                                     <XMarkIcon className="h-4 w-4" />
                                 </button>

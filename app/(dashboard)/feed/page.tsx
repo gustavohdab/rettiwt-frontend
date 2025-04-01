@@ -17,10 +17,10 @@ export default function FeedPage() {
             {/* Tweet composer and timeline are managed together in TweetList */}
             <Suspense fallback={
                 <div>
-                    <div className="border-b border-gray-200 dark:border-gray-800 p-4">
-                        <div className="animate-pulse h-24 bg-gray-100 dark:bg-gray-800 rounded"></div>
+                    <div className="border-b p-4">
+                        <div className="animate-pulse h-24 rounded"></div>
                     </div>
-                    <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                    <div className="divide-y">
                         {[...Array(5)].map((_, i) => (
                             <TweetSkeleton key={i} />
                         ))}

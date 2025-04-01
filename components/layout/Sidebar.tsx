@@ -90,7 +90,7 @@ export default function Sidebar() {
     const isProfileActive = username && pathname === `/${username}`;
 
     return (
-        <div className="hidden lg:block w-[350px] h-screen overflow-y-auto px-4 py-4 sticky top-0">
+        <div className="hidden lg:block">
             <div className="space-y-2 px-3">
                 {/* Logo */}
                 <Link href="/feed" className="flex items-center mb-6 px-2">
@@ -114,7 +114,7 @@ export default function Sidebar() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-2 py-2.5 md:py-2 lg:py-3 text-base lg:text-lg font-medium rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${isActive ? 'text-blue-500' : 'text-gray-900 dark:text-gray-100'
+                                className={`flex items-center px-2 py-2.5 md:py-2 lg:py-3 text-base lg:text-lg font-medium rounded-full hover:bg-gray-800 transition-colors ${isActive ? 'text-[var(--accent)]' : 'text-[var(--foreground)]'
                                     }`}
                             >
                                 <Icon className="w-6 h-6 lg:w-7 lg:h-7 mr-4" aria-hidden="true" />
@@ -127,7 +127,7 @@ export default function Sidebar() {
                 {/* Tweet Button */}
                 <button
                     type="button"
-                    className="mt-6 w-full bg-blue-500 text-white px-4 py-3 lg:py-4 rounded-full font-bold hover:bg-blue-600 transition duration-200"
+                    className="mt-6 w-full bg-white text-black px-4 py-3 lg:py-4 rounded-full font-bold hover:bg-opacity-90 transition duration-200"
                 >
                     Tweet
                 </button>
@@ -137,9 +137,9 @@ export default function Sidebar() {
             {(userData || session?.user) && !isLoading && (
                 <div className="px-3 mt-auto">
                     <Link href={username ? `/${username}` : '/profile'}>
-                        <div className="flex items-center p-2 lg:p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                        <div className="flex items-center p-2 lg:p-3 rounded-full hover:bg-gray-800 cursor-pointer transition-colors">
                             <div className="flex-shrink-0">
-                                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer">
                                     {image ? (
                                         <Image
                                             src={getImageUrl(image)}
@@ -154,10 +154,10 @@ export default function Sidebar() {
                                 </div>
                             </div>
                             <div className="ml-3 flex-1 min-w-0">
-                                <p className="text-sm lg:text-base font-medium text-gray-900 dark:text-white truncate">
+                                <p className="text-sm lg:text-base font-medium text-[var(--foreground)] truncate">
                                     {name}
                                 </p>
-                                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
+                                <p className="text-xs lg:text-sm text-[var(--secondary)] truncate">
                                     @{username || 'user'}
                                 </p>
                             </div>
@@ -165,7 +165,7 @@ export default function Sidebar() {
                                 e.stopPropagation();
                                 e.preventDefault();
                                 handleSignOut();
-                            }} className="p-1 lg:p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            }} className="p-1 lg:p-2 rounded-full hover:bg-gray-700 transition-colors">
                                 <ArrowLeftOnRectangleIcon className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
                             </button>
                         </div>

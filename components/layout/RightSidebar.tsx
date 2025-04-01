@@ -24,7 +24,7 @@ export default function RightSidebar() {
             </div>
 
             {/* Footer */}
-            <div className="mt-4 px-4 text-xs text-gray-500">
+            <div className="mt-4 px-4 text-xs text-[var(--secondary)]">
                 <span className="mr-2 hover:underline cursor-pointer">Terms of Service</span>
                 <span className="mr-2 hover:underline cursor-pointer">Privacy Policy</span>
                 <span className="mr-2 hover:underline cursor-pointer">Cookie Policy</span>

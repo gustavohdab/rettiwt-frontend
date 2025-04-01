@@ -27,9 +27,9 @@ export default function FollowButton({
     if (user?.username === username) return null;
 
     const sizeClasses = {
-        sm: "px-3 py-1 text-xs",
+        sm: "px-3 py-1.5 text-xs",
         md: "px-4 py-2 text-sm",
-        lg: "px-5 py-2",
+        lg: "px-5 py-2.5",
     };
 
     const handleFollowClick = async (e: React.MouseEvent) => {
@@ -51,9 +51,9 @@ export default function FollowButton({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             disabled={isLoading}
-            className={`rounded-full font-semibold transition-colors ${sizeClasses[size]} ${following
-                ? "border border-gray-300 dark:border-gray-600 hover:border-red-500 hover:text-red-500 dark:hover:text-red-500"
-                : "bg-black text-white dark:bg-white dark:text-black"
+            className={`rounded-full font-bold transition-colors ${sizeClasses[size]} ${following
+                ? "border border-gray-600 bg-transparent text-[var(--foreground)] hover:border-red-500 hover:text-red-500"
+                : "bg-white text-black hover:bg-opacity-90"
                 } ${isLoading ? "opacity-70" : ""} ${className}`}
         >
             {withText

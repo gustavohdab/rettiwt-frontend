@@ -80,24 +80,24 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
 
     return (
         <article
-            className={`p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-gray-900 transition duration-150 cursor-pointer ${withBorder ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}
+            className={`p-5 sm:p-6 hover:bg-[#121212] transition duration-150 cursor-pointer ${withBorder ? 'border-b border-gray-800' : ''}`}
             onClick={navigateToTweet}
         >
             {/* Retweet indicator */}
             {tweet.isRetweet && tweet.retweetedBy && (
-                <div className="flex items-center text-gray-500 text-sm sm:text-base mb-2">
-                    <ArrowPathRoundedSquareIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <div className="flex items-center text-[var(--secondary)] text-sm sm:text-base mb-3">
+                    <ArrowPathRoundedSquareIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-3" />
                     <span>{tweet.retweetedBy.name} Retweeted</span>
                 </div>
             )}
 
             {/* Reply indicator */}
             {tweet.inReplyTo && (
-                <div className="flex items-center text-gray-500 text-sm sm:text-base mb-2">
-                    <ChatBubbleOvalLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <div className="flex items-center text-[var(--secondary)] text-sm sm:text-base mb-3">
+                    <ChatBubbleOvalLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-3" />
                     <span>Replying to </span>
                     <button
-                        className="ml-1 text-blue-500 hover:underline"
+                        className="ml-1 text-[var(--accent)] hover:underline"
                         onClick={(e) => {
                             e.stopPropagation();
                             if (tweet.inReplyTo) {
@@ -112,9 +112,9 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
 
             <div className="flex">
                 {/* Author avatar */}
-                <div className="flex-shrink-0 mr-3 sm:mr-4">
+                <div className="flex-shrink-0 mr-4">
                     <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer"
                         onClick={(e) => navigateToProfile(e, author.username)}
                     >
                         {author.avatar ? (
@@ -126,7 +126,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                                 className="rounded-full w-full h-full object-cover"
                             />
                         ) : (
-                            <span className="text-gray-500 text-sm sm:text-base lg:text-lg font-medium">
+                            <span className="text-gray-500 text-sm sm:text-base font-medium">
                                 {author.name.charAt(0).toUpperCase()}
                             </span>
                         )}
@@ -137,42 +137,42 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                 {/* Tweet content */}
                 <div className="flex-1 min-w-0">
                     {/* Tweet header */}
-                    <div className="flex flex-wrap items-center mb-1 sm:mb-2">
+                    <div className="flex flex-wrap items-center mb-2">
                         <span
-                            className="font-bold text-gray-900 dark:text-white hover:underline mr-1 cursor-pointer text-base sm:text-lg"
+                            className="font-bold text-[var(--foreground)] hover:underline mr-2 cursor-pointer text-base sm:text-lg"
                             onClick={(e) => navigateToProfile(e, author.username)}
                         >
                             {author.name}
                         </span>
                         {author.verified && (
-                            <span className="text-blue-500 mr-1">
+                            <span className="text-[var(--accent)] mr-2">
                                 <svg className="h-4 w-4 sm:h-5 sm:w-5 inline-block" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z" />
                                 </svg>
                             </span>
                         )}
                         <span
-                            className="text-gray-500 dark:text-gray-400 hover:underline cursor-pointer text-sm sm:text-base"
+                            className="text-[var(--secondary)] hover:underline cursor-pointer text-sm sm:text-base"
                             onClick={(e) => navigateToProfile(e, author.username)}
                         >
                             @{author.username}
                         </span>
-                        <span className="mx-1 text-gray-500 dark:text-gray-400">·</span>
-                        <span className="text-gray-500 dark:text-gray-400 hover:underline text-sm sm:text-base">
+                        <span className="mx-2 text-[var(--secondary)]">·</span>
+                        <span className="text-[var(--secondary)] hover:underline text-sm sm:text-base">
                             {formattedDate}
                         </span>
                     </div>
 
                     {/* Tweet text */}
-                    <div className="mb-3 text-gray-900 dark:text-white whitespace-pre-wrap text-base sm:text-lg leading-relaxed">
+                    <div className="mb-4 text-[var(--foreground)] whitespace-pre-wrap text-base sm:text-lg leading-relaxed">
                         {displayTweet.content}
                     </div>
 
                     {/* Tweet images */}
                     {displayTweet.media && displayTweet.media.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                             {displayTweet.media.map((item, index) => (
-                                <div key={index} className="relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                <div key={index} className="relative rounded-xl overflow-hidden bg-gray-800">
                                     {item.url && (
                                         <Image
                                             src={getImageUrl(item.url)}
@@ -188,34 +188,34 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     )}
 
                     {/* Tweet actions */}
-                    <div className="flex justify-between mt-2 sm:mt-3 text-gray-500 dark:text-gray-400">
+                    <div className="flex justify-between mt-3 text-[var(--secondary)]">
                         {/* Reply */}
                         <button
                             onClick={navigateToTweet}
-                            className="flex items-center hover:text-blue-500 transition duration-150 p-1 sm:p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            className="flex items-center hover:text-[var(--accent)] transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a]"
                         >
-                            <ChatBubbleOvalLeftIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" />
+                            <ChatBubbleOvalLeftIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
                             <span className="text-sm sm:text-base">{displayTweet.engagementCount?.replies || 0}</span>
                         </button>
 
                         {/* Retweet */}
                         <button
                             onClick={handleRetweet}
-                            className={`flex items-center hover:text-green-500 transition duration-150 p-1 sm:p-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 ${isRetweeted ? 'text-green-500' : ''}`}
+                            className={`flex items-center hover:text-green-500 transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a] ${isRetweeted ? 'text-green-500' : ''}`}
                         >
-                            <ArrowPathRoundedSquareIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" />
+                            <ArrowPathRoundedSquareIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
                             <span className="text-sm sm:text-base">{retweetCount}</span>
                         </button>
 
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className={`flex items-center hover:text-red-500 transition duration-150 p-1 sm:p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 ${isLiked ? 'text-red-500' : ''}`}
+                            className={`flex items-center hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a] ${isLiked ? 'text-red-500' : ''}`}
                         >
                             {isLiked ? (
-                                <HeartIconSolid className="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" />
+                                <HeartIconSolid className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
                             ) : (
-                                <HeartIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" />
+                                <HeartIcon className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
                             )}
                             <span className="text-sm sm:text-base">{likeCount}</span>
                         </button>
@@ -229,7 +229,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                         {/* Share */}
                         <button
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center hover:text-blue-500 transition duration-150 p-1 sm:p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            className="flex items-center hover:text-[var(--accent)] transition duration-150 p-2 rounded-full hover:bg-[#1a1a1a]"
                         >
                             <ArrowUpTrayIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                         </button>

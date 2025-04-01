@@ -225,13 +225,13 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                     )}
 
                     {/* Action bar */}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-800">
-                        <div className="flex space-x-1">
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-800">
+                        <div className="flex space-x-2">
                             {/* Image upload button */}
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="p-2 text-blue-500 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900"
+                                className="p-2 text-[var(--accent)] rounded-full hover:bg-[#1a1a1a]"
                                 disabled={selectedImages.length >= 4}
                             >
                                 <PhotoIcon className="h-5 w-5" />
@@ -247,13 +247,13 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                             />
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                             {/* Character counter */}
                             <span className={`text-sm ${remainingChars <= 20
                                 ? remainingChars <= 0
                                     ? 'text-red-500'
                                     : 'text-yellow-500'
-                                : 'text-gray-500'
+                                : 'text-[var(--secondary)]'
                                 }`}>
                                 {remainingChars}
                             </span>
@@ -262,7 +262,7 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                             <button
                                 type="submit"
                                 disabled={isDisabled}
-                                className={`bg-blue-500 text-white rounded-full px-4 py-1.5 font-bold hover:bg-blue-600 transition duration-200 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                                className={`bg-white text-black rounded-full px-5 py-2 font-bold hover:bg-opacity-90 transition duration-200 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
                             >
                                 {isPending || isUploading ? 'Posting...' : 'Tweet'}
