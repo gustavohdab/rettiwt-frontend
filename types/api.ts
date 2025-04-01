@@ -160,3 +160,8 @@ export interface HashtagTweetsResponse {
 export interface RecommendedUsersResponse {
     users: User[];
 }
+
+export interface ValidationError {
+    field: string;
+    message: string;
+}

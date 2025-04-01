@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useAuth from '@/lib/hooks/useAuth';
+import { ValidationError } from '@/types/api';
+import { getFieldError } from '@/lib/utils/form.utils';
 
 const RegisterForm = () => {
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | ValidationError[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const { register } = useAuth();
@@ -24,19 +26,27 @@ const RegisterForm = () => {
         try {
             const result = await register({ name, username, email, password });
 
-            if (result?.error) {
+            if (!result.success) {
                 setError(result.error);
             } else {
                 router.push('/feed');
                 router.refresh();
             }
         } catch (err) {
-            setError('An unexpected error occurred');
+            setError('An unexpected client-side error occurred');
             console.error(err);
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Get specific field errors for rendering
+    const nameError = getFieldError('name', error);
+    const usernameError = getFieldError('username', error);
+    const emailError = getFieldError('email', error);
+    const passwordError = getFieldError('password', error);
+    // General error is only displayed if error state is a string
+    const generalError = typeof error === 'string' ? error : null;
 
     return (
         <div className="flex flex-col items-center justify-center w-full max-w-md p-6 mx-auto">
@@ -44,9 +54,9 @@ const RegisterForm = () => {
                 <h1 className="text-3xl font-bold">Create your account</h1>
             </div>
 
-            {error && (
+            {generalError && (
                 <div className="w-full p-3 mb-4 text-sm text-white bg-red-500 rounded">
-                    {error}
+                    {generalError}
                 </div>
             )}
 
@@ -61,9 +71,12 @@ const RegisterForm = () => {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-2 border rounded focus:outline-none focus:ring-2 ${nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                         disabled={isLoading}
+                        aria-invalid={!!nameError}
+                        aria-describedby={nameError ? "name-error" : undefined}
                     />
+                    {nameError && <p id="name-error" className="text-xs text-red-600">{nameError}</p>}
                 </div>
 
                 <div className="space-y-1">
@@ -76,9 +89,12 @@ const RegisterForm = () => {
                         required
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-2 border rounded focus:outline-none focus:ring-2 ${usernameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                         disabled={isLoading}
+                        aria-invalid={!!usernameError}
+                        aria-describedby={usernameError ? "username-error" : undefined}
                     />
+                    {usernameError && <p id="username-error" className="text-xs text-red-600">{usernameError}</p>}
                 </div>
 
                 <div className="space-y-1">
@@ -91,9 +107,12 @@ const RegisterForm = () => {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-2 border rounded focus:outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                         disabled={isLoading}
+                        aria-invalid={!!emailError}
+                        aria-describedby={emailError ? "email-error" : undefined}
                     />
+                    {emailError && <p id="email-error" className="text-xs text-red-600">{emailError}</p>}
                 </div>
 
                 <div className="space-y-1">
@@ -106,10 +125,13 @@ const RegisterForm = () => {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full p-2 border rounded focus:outline-none focus:ring-2 ${passwordError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                         disabled={isLoading}
                         minLength={6}
+                        aria-invalid={!!passwordError}
+                        aria-describedby={passwordError ? "password-error" : undefined}
                     />
+                    {passwordError && <p id="password-error" className="text-xs text-red-600">{passwordError}</p>}
                 </div>
 
                 <button

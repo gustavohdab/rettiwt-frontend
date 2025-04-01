@@ -1,40 +1,61 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import useAuth from '@/lib/hooks/useAuth';
+
+// Map NextAuth error codes to user-friendly messages
+const errorMessages: { [key: string]: string } = {
+    CredentialsSignin: "Invalid username/email or password.",
+    Default: "An unexpected error occurred during login. Please try again.",
+};
 
 const LoginForm = () => {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState<string | null>(null);
+    const [loginError, setLoginError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const { login } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    // Check for error codes passed in URL by NextAuth redirect
+    const urlError = searchParams.get('error');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
+        setLoginError(null); // Clear previous errors
         setIsLoading(true);
 
         try {
+            // Attempt login using the useAuth hook
             const result = await login({ usernameOrEmail, password });
 
             if (result?.error) {
-                setError(result.error);
+                // If login hook returns an error (e.g., CredentialsSignin)
+                const errorMessage = errorMessages[result.error] || errorMessages.Default;
+                setLoginError(errorMessage);
+            } else if (!result?.ok) {
+                // Handle cases where signIn might return ok: false without a specific error code
+                setLoginError(errorMessages.Default);
             } else {
+                // Successful login - redirect to feed
                 router.push('/feed');
-                router.refresh();
+                router.refresh(); // Refresh session data
             }
         } catch (err) {
-            setError('An unexpected error occurred');
-            console.error(err);
+            // Catch unexpected errors during the login process itself
+            console.error("Login submission error:", err);
+            setLoginError(errorMessages.Default);
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Determine which error message to display
+    // Priority: 1. Error from submit, 2. Error from URL param
+    const displayError = loginError || (urlError ? (errorMessages[urlError] || errorMessages.Default) : null);
 
     return (
         <div className="flex flex-col items-center justify-center w-full max-w-md p-6 mx-auto">
@@ -42,9 +63,10 @@ const LoginForm = () => {
                 <h1 className="text-3xl font-bold">Log in to Rettiwt</h1>
             </div>
 
-            {error && (
+            {/* Display Login Error */}
+            {displayError && (
                 <div className="w-full p-3 mb-4 text-sm text-white bg-red-500 rounded">
-                    {error}
+                    {displayError}
                 </div>
             )}
 

@@ -59,27 +59,6 @@ export default function PopularTweets({ initialTweets }: PopularTweetsProps) {
         }
     };
 
-    if (loading && tweets.length === 0) {
-        return (
-            <div className="space-y-4">
-                <h2 className="text-xl font-bold p-4">Popular Tweets</h2>
-                {[...Array(3)].map((_, i) => (
-                    <div key={i} className="border-b border-gray-200 dark:border-gray-800 p-4">
-                        <div className="flex items-start gap-3">
-                            <Skeleton className="h-10 w-10 rounded-full" />
-                            <div className="flex-1">
-                                <Skeleton className="h-4 w-32 mb-2" />
-                                <Skeleton className="h-3 w-24 mb-3" />
-                                <Skeleton className="h-16 w-full rounded-md mb-2" />
-                                <Skeleton className="h-4 w-full" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
     if (error && tweets.length === 0) {
         return (
             <div className="p-4">
