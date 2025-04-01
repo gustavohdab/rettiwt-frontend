@@ -11,15 +11,18 @@ import {
     UserIcon,
     BookmarkIcon,
     EllipsisHorizontalCircleIcon,
-    ArrowLeftOnRectangleIcon
+    ArrowLeftOnRectangleIcon,
+    HashtagIcon
 } from '@heroicons/react/24/outline';
 import {
     HomeIcon as HomeIconSolid,
-    MagnifyingGlassIcon as MagnifyingGlassIconSolid
+    MagnifyingGlassIcon as MagnifyingGlassIconSolid,
+    HashtagIcon as HashtagIconSolid
 } from '@heroicons/react/24/solid';
 
 const navigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
+    { name: 'Explore', href: '/explore', icon: HashtagIcon, activeIcon: HashtagIconSolid },
     { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
     { name: 'Notifications', href: '/notifications', icon: BellIcon },
     { name: 'Messages', href: '/messages', icon: EnvelopeIcon },
@@ -37,7 +40,7 @@ export default function Sidebar() {
     };
 
     return (
-        <div className="flex flex-col justify-between h-full py-4">
+        <div className="hidden lg:block w-[350px] h-screen overflow-y-auto px-4 py-4 sticky top-0">
             <div className="space-y-2 px-3">
                 {/* Logo */}
                 <Link href="/feed" className="flex items-center mb-6 px-2">

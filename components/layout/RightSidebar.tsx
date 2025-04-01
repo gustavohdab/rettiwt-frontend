@@ -1,4 +1,3 @@
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import SearchInput from '../search/SearchInput';
 
 // This is a Server Component - it can fetch data directly

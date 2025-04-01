@@ -1,5 +1,6 @@
 import AppShell from '@/components/layout/AppShell';
 import RightSidebar from '@/components/layout/RightSidebar';
+import Sidebar from '@/components/layout/Sidebar';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -15,6 +16,9 @@ export default function DashboardLayout({
     return (
         <AppShell>
             <div className="flex">
+                {/* Left sidebar */}
+                <Sidebar />
+
                 {/* Main content area */}
                 <div className="flex-1">
                     {children}

@@ -10,6 +10,8 @@ import type {
     PaginationInfo,
 } from "./api";
 
+import * as ApiTypes from "./api";
+
 // User model for UI
 export interface User extends Omit<ApiUser, "following" | "followers"> {
     following: User[];
@@ -145,5 +147,60 @@ export function normalizeTimelineResponse(
     return {
         tweets: response.tweets.map(normalizeTweet),
         pagination: response.pagination,
+    };
+}
+
+export interface TrendingHashtag {
+    hashtag: string;
+    count: number;
+    tweetCount: number;
+    engagementScore: number;
+}
+
+export interface RecommendedUser extends User {
+    isFollowing?: boolean;
+}
+
+export function normalizeHashtagTweets(data: ApiTypes.HashtagTweetsResponse): {
+    hashtag: string;
+    tweets: Tweet[];
+    pagination: PaginationInfo;
+} {
+    return {
+        hashtag: data.hashtag,
+        tweets: data.tweets.map(normalizeTweet),
+        pagination: data.pagination,
+    };
+}
+
+export function normalizeTrendingHashtags(data: ApiTypes.TrendingResponse): {
+    trendingHashtags: TrendingHashtag[];
+} {
+    return {
+        trendingHashtags: data.trendingHashtags.map(
+            (hashtag: ApiTypes.TrendingHashtag) => ({
+                ...hashtag,
+            })
+        ),
+    };
+}
+
+export function normalizePopularTweets(data: ApiTypes.PopularTweetsResponse): {
+    tweets: Tweet[];
+    pagination: PaginationInfo;
+} {
+    return {
+        tweets: data.tweets.map(normalizeTweet),
+        pagination: data.pagination,
+    };
+}
+
+export function normalizeRecommendedUsers(
+    data: ApiTypes.RecommendedUsersResponse
+): {
+    users: RecommendedUser[];
+} {
+    return {
+        users: data.users.map(normalizeUser) as RecommendedUser[],
     };
 }

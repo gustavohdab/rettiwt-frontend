@@ -128,3 +128,29 @@ export interface TweetThreadResponse {
     replies: Tweet[];
     pagination: PaginationInfo;
 }
+
+export interface TrendingHashtag {
+    hashtag: string;
+    count: number;
+    tweetCount: number;
+    engagementScore: number;
+}
+
+export interface TrendingResponse {
+    trendingHashtags: TrendingHashtag[];
+}
+
+export interface PopularTweetsResponse {
+    tweets: Tweet[];
+    pagination: PaginationInfo;
+}
+
+export interface HashtagTweetsResponse {
+    hashtag: string;
+    tweets: Tweet[];
+    pagination: PaginationInfo;
+}
+
+export interface RecommendedUsersResponse {
+    users: User[];
+}

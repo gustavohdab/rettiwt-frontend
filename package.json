@@ -12,6 +12,7 @@
     "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.71.1",
     "axios": "^1.8.4",
+    "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.6.2",
     "next": "15.2.4",
@@ -19,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
+    "tailwind-merge": "^3.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

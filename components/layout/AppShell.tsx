@@ -25,25 +25,20 @@ export default function AppShell({ children }: AppShellProps) {
 
     // If not authenticated, just render children (auth pages handle their own layout)
     if (!session) {
-        return <div className="min-h-screen bg-white dark:bg-gray-900">{children}</div>
+        return <>{children}</>
     }
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900">
-            {/* Desktop sidebar - hidden on mobile */}
-            <div className="fixed top-0 left-0 hidden md:flex h-screen md:w-64 lg:w-72 xl:w-80 flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-30">
-                <Sidebar />
-            </div>
-
             {/* Mobile navigation - fixed at bottom on mobile */}
             <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-10">
                 <Navigation isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
             </div>
 
             {/* Main content - with responsive padding and width */}
-            <main className="md:ml-64 lg:ml-72 xl:ml-80 min-h-screen pb-16 md:pb-0">
+            <main className="min-h-screen pb-16 md:pb-0">
                 <div className="w-full mx-auto px-4 sm:px-6 md:px-8 py-4 md:py-6">
-                    <div className="max-w-full md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto">
+                    <div className="max-w-full md:max-w-2xl lg:max-w-3xl xl:max-w-[100rem] mx-auto">
                         {children}
                     </div>
                 </div>
