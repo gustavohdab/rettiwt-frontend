@@ -289,11 +289,13 @@ const TweetService = {
      * @param page Page number
      * @param limit Items per page
      * @param accessToken Optional auth token for server components
+     * @param includeReplies Whether to include replies
      */
     getTimeline: async (
         page = 1,
         limit = 20,
-        accessToken?: string
+        accessToken?: string,
+        includeReplies = false
     ): Promise<
         ApiTypes.ApiResponse<{
             tweets: Tweet[];
@@ -302,7 +304,7 @@ const TweetService = {
     > => {
         try {
             const config: any = {
-                params: { page, limit },
+                params: { page, limit, includeReplies },
             };
 
             if (accessToken) {
@@ -432,6 +434,68 @@ const TweetService = {
         } catch (error) {
             console.error(`Error getting replies for user ${username}:`, error);
             return { status: "error", message: "Failed to get user replies" };
+        }
+    },
+
+    /**
+     * Get tweet thread (tweet with replies)
+     * @param id Tweet ID
+     * @param page Page number
+     * @param limit Items per page
+     * @param accessToken Optional auth token for server components
+     */
+    getTweetThread: async (
+        id: string,
+        page = 1,
+        limit = 10,
+        accessToken?: string
+    ): Promise<
+        ApiTypes.ApiResponse<{
+            tweet: Tweet;
+            parentTweet?: Tweet;
+            replies: Tweet[];
+            pagination: ApiTypes.PaginationInfo;
+        }>
+    > => {
+        try {
+            const config: any = {
+                params: { page, limit },
+            };
+
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            const response = await api.get<
+                ApiTypes.ApiResponse<{
+                    tweet: ApiTypes.Tweet;
+                    parentTweet?: ApiTypes.Tweet;
+                    replies: ApiTypes.Tweet[];
+                    pagination: ApiTypes.PaginationInfo;
+                }>
+            >(`/tweets/${id}/thread`, config);
+
+            // Transform API response to UI model
+            if (response.data.status === "success" && response.data.data) {
+                return {
+                    status: "success",
+                    data: {
+                        tweet: normalizeTweet(response.data.data.tweet),
+                        parentTweet: response.data.data.parentTweet
+                            ? normalizeTweet(response.data.data.parentTweet)
+                            : undefined,
+                        replies: response.data.data.replies.map(normalizeTweet),
+                        pagination: response.data.data.pagination,
+                    },
+                };
+            }
+
+            return response.data as any;
+        } catch (error) {
+            console.error(`Error getting tweet thread for ${id}:`, error);
+            return { status: "error", message: "Failed to get tweet thread" };
         }
     },
 };

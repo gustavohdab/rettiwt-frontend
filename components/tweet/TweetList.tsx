@@ -18,7 +18,8 @@ export default async function TweetList() {
 
     try {
         // Fetch the initial timeline data from the API
-        const timelineResponse = await TweetService.getTimeline(1, 10, session?.accessToken);
+        // By default, we don't include replies in the initial load
+        const timelineResponse = await TweetService.getTimeline(1, 10, session?.accessToken, false);
 
         if (timelineResponse.status !== 'success' || !timelineResponse.data) {
             return (

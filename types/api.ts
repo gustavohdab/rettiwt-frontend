@@ -120,3 +120,11 @@ export interface SearchResponse {
     hashtags?: string[];
     pagination: PaginationInfo;
 }
+
+// Thread response from API
+export interface TweetThreadResponse {
+    tweet: Tweet;
+    parentTweet?: Tweet;
+    replies: Tweet[];
+    pagination: PaginationInfo;
+}

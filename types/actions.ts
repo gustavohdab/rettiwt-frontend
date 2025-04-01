@@ -49,3 +49,10 @@ export interface ProfileActionResponse {
     error?: string;
     user?: User;
 }
+
+// Reply action params
+export interface ReplyActionParams {
+    content: string;
+    parentId: string;
+    images?: string[];
+}

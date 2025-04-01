@@ -92,6 +92,13 @@ This project uses a milestone-based development approach:
 6. Notifications & Real-time
 7. Direct Messages
 
+## Documentation
+
+-   [API Documentation](./docs/API.md)
+-   [Types Documentation](./docs/TYPES.md)
+-   [Business Rules](./docs/business-rules/)
+    -   [Timeline Rules](./docs/business-rules/timeline.md)
+
 ## License
 
 MIT

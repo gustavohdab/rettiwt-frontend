@@ -50,6 +50,14 @@ export interface TimelineResponse {
     pagination: PaginationInfo;
 }
 
+// Tweet thread response for UI
+export interface TweetThreadResponse {
+    tweet: Tweet;
+    parentTweet?: Tweet;
+    replies: Tweet[];
+    pagination: PaginationInfo;
+}
+
 // Type guard to check if an object is a User (not a string ID)
 export function isUser(obj: any): obj is User {
     return obj && typeof obj !== "string" && typeof obj._id === "string";

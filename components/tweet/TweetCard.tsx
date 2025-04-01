@@ -28,7 +28,9 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
     );
 
     // Handle like/unlike
-    const handleLike = async () => {
+    const handleLike = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent navigation to tweet detail
+
         // Optimistic update
         if (isLiked) {
             setIsLiked(false);
@@ -42,7 +44,9 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
     };
 
     // Handle retweet/unretweet
-    const handleRetweet = async () => {
+    const handleRetweet = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent navigation to tweet detail
+
         // Optimistic update
         if (isRetweeted) {
             setIsRetweeted(false);
@@ -55,17 +59,26 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
         }
     };
 
-    // Handle reply
-    const handleReply = () => {
-        router.push(`/tweet/${tweet._id}`);
-    };
-
     // For retweets, use the original tweet content but show who retweeted it
     const displayTweet = tweet.isRetweet && tweet.originalTweet ? tweet.originalTweet : tweet;
     const author = displayTweet.author;
 
+    // Navigate to tweet detail page
+    const navigateToTweet = () => {
+        router.push(`/tweet/${tweet._id}`);
+    };
+
+    // Navigate to user profile, stopping propagation
+    const navigateToProfile = (e: React.MouseEvent, username: string) => {
+        e.stopPropagation(); // Prevent navigation to tweet detail
+        router.push(`/${username}`);
+    };
+
     return (
-        <div className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition duration-150 ${withBorder ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}>
+        <article
+            className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition duration-150 cursor-pointer ${withBorder ? 'border-b border-gray-200 dark:border-gray-800' : ''}`}
+            onClick={navigateToTweet}
+        >
             {/* Retweet indicator */}
             {tweet.isRetweet && tweet.retweetedBy && (
                 <div className="flex items-center text-gray-500 text-sm mb-2">
@@ -74,35 +87,58 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                 </div>
             )}
 
+            {/* Reply indicator */}
+            {tweet.inReplyTo && (
+                <div className="flex items-center text-gray-500 text-sm mb-2">
+                    <ChatBubbleOvalLeftIcon className="h-4 w-4 mr-2" />
+                    <span>Replying to </span>
+                    <button
+                        className="ml-1 text-blue-500 hover:underline"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (tweet.inReplyTo) {
+                                router.push(`/tweet/${tweet.inReplyTo._id}`);
+                            }
+                        }}
+                    >
+                        @{tweet.inReplyTo.author.username}
+                    </button>
+                </div>
+            )}
+
             <div className="flex">
                 {/* Author avatar */}
                 <div className="flex-shrink-0 mr-3">
-                    <Link href={`/${author.username}`}>
-                        <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                            {author.avatar ? (
-                                <Image
-                                    src={author.avatar}
-                                    alt={author.name}
-                                    width={48}
-                                    height={48}
-                                    className="rounded-full"
-                                />
-                            ) : (
-                                <span className="text-gray-500 text-sm font-medium">
-                                    {author.name.charAt(0).toUpperCase()}
-                                </span>
-                            )}
-                        </div>
-                    </Link>
+                    <div
+                        className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer"
+                        onClick={(e) => navigateToProfile(e, author.username)}
+                    >
+                        {author.avatar ? (
+                            <Image
+                                src={author.avatar}
+                                alt={author.name}
+                                width={48}
+                                height={48}
+                                className="rounded-full"
+                            />
+                        ) : (
+                            <span className="text-gray-500 text-sm font-medium">
+                                {author.name.charAt(0).toUpperCase()}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Tweet content */}
                 <div className="flex-1 min-w-0">
                     {/* Tweet header */}
                     <div className="flex items-center mb-1">
-                        <Link href={`/${author.username}`} className="font-bold text-gray-900 dark:text-white hover:underline mr-1">
+                        <span
+                            className="font-bold text-gray-900 dark:text-white hover:underline mr-1 cursor-pointer"
+                            onClick={(e) => navigateToProfile(e, author.username)}
+                        >
                             {author.name}
-                        </Link>
+                        </span>
                         {author.verified && (
                             <span className="text-blue-500 mr-1">
                                 <svg className="h-4 w-4 inline-block" fill="currentColor" viewBox="0 0 24 24">
@@ -110,9 +146,12 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                                 </svg>
                             </span>
                         )}
-                        <Link href={`/${author.username}`} className="text-gray-500 dark:text-gray-400 hover:underline">
+                        <span
+                            className="text-gray-500 dark:text-gray-400 hover:underline cursor-pointer"
+                            onClick={(e) => navigateToProfile(e, author.username)}
+                        >
                             @{author.username}
-                        </Link>
+                        </span>
                         <span className="mx-1 text-gray-500 dark:text-gray-400">·</span>
                         <span className="text-gray-500 dark:text-gray-400 hover:underline">
                             {formatDistanceToNow(new Date(displayTweet.createdAt), { addSuffix: true })}
@@ -132,14 +171,15 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                                 <div className={`grid ${media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2 mb-3`}>
                                     {media.map((item, index) => (
                                         <div key={index} className="relative rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                            <Image
-                                                src={`${process.env.NEXT_PUBLIC_API_URL_MEDIA}${item.url}`}
-                                                alt={item.altText || `Image ${index + 1}`}
-                                                width={500}
-                                                height={media.length === 1 ? 300 : 200}
-                                                className="object-cover w-full"
-                                            />
-
+                                            {item.url && (
+                                                <Image
+                                                    src={`http://localhost:5000${item.url}`}
+                                                    alt={item.altText || `Image ${index + 1}`}
+                                                    width={500}
+                                                    height={media.length === 1 ? 300 : 200}
+                                                    className="object-cover w-full"
+                                                />
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -152,7 +192,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     <div className="flex justify-between max-w-md text-gray-500 dark:text-gray-400">
                         {/* Reply */}
                         <button
-                            onClick={handleReply}
+                            onClick={navigateToTweet}
                             className="flex items-center hover:text-blue-500 transition duration-150"
                         >
                             <ChatBubbleOvalLeftIcon className="h-5 w-5 mr-1" />
@@ -183,6 +223,7 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
 
                         {/* Share */}
                         <button
+                            onClick={(e) => e.stopPropagation()}
                             className="flex items-center hover:text-blue-500 transition duration-150"
                         >
                             <ArrowUpTrayIcon className="h-5 w-5" />
@@ -190,6 +231,6 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     </div>
                 </div>
             </div>
-        </div>
+        </article>
     );
 } 

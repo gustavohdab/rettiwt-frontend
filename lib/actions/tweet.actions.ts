@@ -11,6 +11,7 @@ import type {
     RetweetActionResponse,
     Tweet,
     Media,
+    ReplyActionParams,
 } from "@/types";
 
 // Helper function to determine media type based on URL
@@ -100,7 +101,7 @@ export async function deleteTweet(id: string): Promise<TweetActionResponse> {
     }
 }
 
-export async function likeTweet(id: string): Promise<LikeActionResponse> {
+export async function likeTweet(tweetId: string): Promise<TweetActionResponse> {
     try {
         const session = await getServerSession(authOptions);
 
@@ -108,11 +109,17 @@ export async function likeTweet(id: string): Promise<LikeActionResponse> {
             return { error: "Not authenticated" };
         }
 
-        const response = await TweetService.likeTweet(id, session?.accessToken);
+        const response = await TweetService.likeTweet(
+            tweetId,
+            session?.accessToken
+        );
 
-        // No need to revalidate here as we'll use optimistic UI
-        if (response.status === "success") {
-            return { success: true };
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
+        revalidatePath("/feed");
+
+        if (response.status === "success" && response.data?.tweet) {
+            return { success: true, data: response.data.tweet };
         } else {
             return { error: response.message || "Failed to like tweet" };
         }
@@ -122,7 +129,9 @@ export async function likeTweet(id: string): Promise<LikeActionResponse> {
     }
 }
 
-export async function unlikeTweet(id: string): Promise<LikeActionResponse> {
+export async function unlikeTweet(
+    tweetId: string
+): Promise<TweetActionResponse> {
     try {
         const session = await getServerSession(authOptions);
 
@@ -131,13 +140,16 @@ export async function unlikeTweet(id: string): Promise<LikeActionResponse> {
         }
 
         const response = await TweetService.unlikeTweet(
-            id,
+            tweetId,
             session?.accessToken
         );
 
-        // No need to revalidate here as we'll use optimistic UI
-        if (response.status === "success") {
-            return { success: true };
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
+        revalidatePath("/feed");
+
+        if (response.status === "success" && response.data?.tweet) {
+            return { success: true, data: response.data.tweet };
         } else {
             return { error: response.message || "Failed to unlike tweet" };
         }
@@ -147,7 +159,9 @@ export async function unlikeTweet(id: string): Promise<LikeActionResponse> {
     }
 }
 
-export async function retweetTweet(id: string): Promise<RetweetActionResponse> {
+export async function retweetTweet(
+    tweetId: string
+): Promise<TweetActionResponse> {
     try {
         const session = await getServerSession(authOptions);
 
@@ -156,16 +170,16 @@ export async function retweetTweet(id: string): Promise<RetweetActionResponse> {
         }
 
         const response = await TweetService.retweetTweet(
-            id,
+            tweetId,
             session?.accessToken
         );
 
-        // We still revalidate here because a retweet creates a new tweet in the timeline
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
         revalidatePath("/feed");
-        revalidatePath(`/profile`);
 
-        if (response.status === "success") {
-            return { success: true };
+        if (response.status === "success" && response.data?.tweet) {
+            return { success: true, data: response.data.tweet };
         } else {
             return { error: response.message || "Failed to retweet tweet" };
         }
@@ -176,8 +190,8 @@ export async function retweetTweet(id: string): Promise<RetweetActionResponse> {
 }
 
 export async function unretweetTweet(
-    id: string
-): Promise<RetweetActionResponse> {
+    tweetId: string
+): Promise<TweetActionResponse> {
     try {
         const session = await getServerSession(authOptions);
 
@@ -186,21 +200,67 @@ export async function unretweetTweet(
         }
 
         const response = await TweetService.unretweetTweet(
-            id,
+            tweetId,
             session?.accessToken
         );
 
-        // We still revalidate here because removing a retweet removes a tweet from the timeline
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
         revalidatePath("/feed");
-        revalidatePath(`/profile`);
 
-        if (response.status === "success") {
-            return { success: true };
+        if (response.status === "success" && response.data?.tweet) {
+            return { success: true, data: response.data.tweet };
         } else {
             return { error: response.message || "Failed to unretweet tweet" };
         }
     } catch (error) {
         console.error("Error unretweeting tweet:", error);
         return { error: "Failed to unretweet tweet" };
+    }
+}
+
+export async function createReply(
+    params: ReplyActionParams
+): Promise<TweetActionResponse> {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return { error: "Not authenticated" };
+        }
+
+        // Convert image URLs to the Media format expected by the backend
+        const media: Media[] = params.images
+            ? params.images.map((url) => ({
+                  type: determineMediaType(url),
+                  url: url,
+                  altText: "",
+              }))
+            : [];
+
+        // Use the existing createTweet service method with inReplyToId
+        const response = await TweetService.createTweet(
+            {
+                content: params.content,
+                media: media,
+                inReplyToId: params.parentId,
+            },
+            session?.accessToken
+        );
+
+        // Revalidate the tweet detail page to show the new reply
+        revalidatePath(`/tweet/${params.parentId}`);
+
+        // Also revalidate the feed
+        revalidatePath("/feed");
+
+        if (response.status === "success" && response.data?.tweet) {
+            return { success: true, data: response.data.tweet };
+        } else {
+            return { error: response.message || "Failed to create reply" };
+        }
+    } catch (error) {
+        console.error("Error creating reply:", error);
+        return { error: "Failed to create reply" };
     }
 }

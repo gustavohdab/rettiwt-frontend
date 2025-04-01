@@ -6,6 +6,7 @@ import TweetCard from '../tweet/TweetCard';
 import TweetService from '@/lib/api/services/tweet.service';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import useIntersectionObserver from '@/lib/hooks/useIntersectionObserver';
+import { FunnelIcon } from '@heroicons/react/24/outline';
 
 interface PaginationInfo {
     page: number;
@@ -29,6 +30,7 @@ export default function Timeline({
     const [pagination, setPagination] = useState<PaginationInfo>(initialPagination);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [includeReplies, setIncludeReplies] = useState(true);
 
     // Keep track of tweets loaded through infinite scrolling
     const [loadedTweets, setLoadedTweets] = useState<Tweet[]>([]);
@@ -53,6 +55,38 @@ export default function Timeline({
         }
     }, [initialTweets]);
 
+    // Reset timeline when includeReplies changes
+    useEffect(() => {
+        // Clear loaded tweets and reset to initial state
+        setLoadedTweets([]);
+        tweetIdsRef.current = new Set(initialTweets.map(t => t._id));
+
+        // Reload the timeline with the new setting
+        const reloadTimeline = async () => {
+            try {
+                setIsLoading(true);
+                setError('');
+
+                const response = await TweetService.getTimeline(1, pagination.limit, undefined, includeReplies);
+
+                if (response.status === 'success' && response.data) {
+                    setAllTweets(response.data.tweets);
+                    setPagination(response.data.pagination);
+                    tweetIdsRef.current = new Set(response.data.tweets.map(t => t._id));
+                } else {
+                    setError('Failed to load timeline');
+                }
+            } catch (err) {
+                setError('Error loading tweets. Please try again.');
+                console.error('Error loading timeline:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        reloadTimeline();
+    }, [includeReplies, pagination.limit]);
+
     // Calculate if we have more tweets to load
     const hasMore = pagination.page < pagination.pages;
 
@@ -67,7 +101,7 @@ export default function Timeline({
             setError('');
 
             const nextPage = pagination.page + 1;
-            const response = await TweetService.getTimeline(nextPage, pagination.limit);
+            const response = await TweetService.getTimeline(nextPage, pagination.limit, undefined, includeReplies);
 
             if (response.status === 'success' && response.data) {
                 const newTweets = response.data.tweets;
@@ -92,7 +126,7 @@ export default function Timeline({
         } finally {
             setIsLoading(false);
         }
-    }, [pagination.page, pagination.limit, isLoading, hasMore]);
+    }, [pagination.page, pagination.limit, isLoading, hasMore, includeReplies]);
 
     // Set up intersection observer
     useIntersectionObserver({
@@ -102,8 +136,26 @@ export default function Timeline({
         rootMargin: '200px', // Load more tweets when user is 200px away from the bottom
     });
 
+    // Toggle including replies
+    const toggleReplies = () => {
+        setIncludeReplies(prev => !prev);
+    };
+
     return (
         <div className="flex flex-col">
+            <div className="sticky top-0 z-10 bg-white dark:bg-black p-2 border-b border-gray-200 dark:border-gray-800 flex justify-end">
+                <button
+                    onClick={toggleReplies}
+                    className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${includeReplies
+                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-200'
+                        : 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                        }`}
+                >
+                    <FunnelIcon className="h-4 w-4" />
+                    <span>{includeReplies ? 'Showing Replies' : 'Hide Replies'}</span>
+                </button>
+            </div>
+
             {allTweets.length === 0 && !isLoading ? (
                 <div className="p-8 text-center text-gray-500 border-b border-gray-200 dark:border-gray-800">
                     <p className="mb-2 font-medium">Welcome to your timeline!</p>
