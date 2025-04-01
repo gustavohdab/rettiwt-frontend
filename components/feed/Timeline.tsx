@@ -30,7 +30,7 @@ export default function Timeline({
     const [pagination, setPagination] = useState<PaginationInfo>(initialPagination);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const [includeReplies, setIncludeReplies] = useState(true);
+    const [includeReplies, setIncludeReplies] = useState(false);
 
     // Keep track of tweets loaded through infinite scrolling
     const [loadedTweets, setLoadedTweets] = useState<Tweet[]>([]);

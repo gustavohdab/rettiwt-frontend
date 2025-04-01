@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/actions/user-data.actions';
 import {
     HomeIcon,
     MagnifyingGlassIcon,
@@ -20,8 +23,9 @@ import {
     HashtagIcon as HashtagIconSolid,
     UserIcon as UserIconSolid
 } from '@heroicons/react/24/solid';
+import getImageUrl from '@/lib/utils/getImageUrl';
+import { User } from '@/types/models';
 
-// Define navigation items without Profile (we'll add it dynamically)
 const navigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
     { name: 'Explore', href: '/explore', icon: HashtagIcon, activeIcon: HashtagIconSolid },
@@ -35,7 +39,37 @@ const navigationItems = [
 export default function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const username = session?.user?.username;
+    const [userData, setUserData] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch the current user data from the server
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (session?.user) {
+                setIsLoading(true);
+                try {
+                    const result = await getCurrentUser();
+                    if (result.success && result.data) {
+                        setUserData(result.data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setUserData(null);
+                setIsLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [session?.user]);
+
+    // Use userData if available, otherwise fall back to session data
+    const username = userData?.username || session?.user?.username;
+    const name = userData?.name || session?.user?.name;
+    const image = userData?.avatar || session?.user?.image;
 
     // Create all navigation items including profile with dynamic path
     const allNavigationItems = [
@@ -100,17 +134,19 @@ export default function Sidebar() {
             </div>
 
             {/* User Profile */}
-            {session?.user && (
+            {(userData || session?.user) && !isLoading && (
                 <div className="px-3 mt-auto">
                     <Link href={username ? `/${username}` : '/profile'}>
                         <div className="flex items-center p-2 lg:p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
                             <div className="flex-shrink-0">
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                                    {session.user.image ? (
-                                        <img
-                                            src={session.user.image}
-                                            alt={session.user.name || 'User'}
-                                            className="w-10 h-10 lg:w-12 lg:h-12 rounded-full"
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
+                                    {image ? (
+                                        <Image
+                                            src={getImageUrl(image)}
+                                            alt={name || 'User'}
+                                            width={48}
+                                            height={48}
+                                            className="rounded-full object-cover w-full h-full"
                                         />
                                     ) : (
                                         <UserIcon className="w-6 h-6 lg:w-7 lg:h-7 text-gray-500" />
@@ -119,10 +155,10 @@ export default function Sidebar() {
                             </div>
                             <div className="ml-3 flex-1 min-w-0">
                                 <p className="text-sm lg:text-base font-medium text-gray-900 dark:text-white truncate">
-                                    {session.user.name}
+                                    {name}
                                 </p>
                                 <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
-                                    @{session.user.username || 'user'}
+                                    @{username || 'user'}
                                 </p>
                             </div>
                             <button onClick={(e) => {

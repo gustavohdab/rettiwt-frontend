@@ -2,13 +2,15 @@
 
 import { createTweet } from '@/lib/actions/tweet.actions';
 import { uploadTweetMedia } from '@/lib/actions/upload.actions';
+import { getCurrentUser } from '@/lib/actions/user-data.actions';
 import getImageUrl from '@/lib/utils/getImageUrl';
 import { TweetComposerProps } from '@/types';
+import { User } from '@/types/models';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useTransition } from 'react';
+import { useRef, useState, useTransition, useEffect } from 'react';
 
 export default function TweetComposer({ placeholder = "What's happening?", parentId, onSuccess }: TweetComposerProps = {}) {
     const { data: session } = useSession();
@@ -18,9 +20,38 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
     const [selectedImagesPreview, setSelectedImagesPreview] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [userData, setUserData] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
+    // Fetch the current user data from the server
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (session?.user) {
+                setIsLoading(true);
+                try {
+                    const result = await getCurrentUser();
+                    if (result.success && result.data) {
+                        setUserData(result.data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setUserData(null);
+                setIsLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [session?.user]);
+
+    // Use userData if available, otherwise fall back to session data
+    const name = userData?.name || session?.user?.name;
+    const image = userData?.avatar || session?.user?.image;
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -134,18 +165,18 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
             <div className="flex">
                 {/* User avatar */}
                 <div className="flex-shrink-0 mr-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                        {session.user.image ? (
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
+                        {image ? (
                             <Image
-                                src={getImageUrl(session.user.image)}
-                                alt={session.user.name || 'User'}
+                                src={getImageUrl(image)}
+                                alt={name || 'User'}
                                 width={48}
                                 height={48}
-                                className="rounded-full"
+                                className="rounded-full object-cover w-full h-full"
                             />
                         ) : (
                             <span className="text-gray-500 text-sm font-medium">
-                                {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                                {name?.charAt(0).toUpperCase() || 'U'}
                             </span>
                         )}
                     </div>

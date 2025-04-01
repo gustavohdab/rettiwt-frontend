@@ -128,6 +128,12 @@ export async function updateProfile(data: UpdateProfileParams) {
             if (session.user?.username) {
                 revalidatePath(`/${session.user.username}`);
                 revalidatePath(`/${session.user.username}/edit`);
+
+                // Revalidate paths that include the layout with sidebar
+                revalidatePath("/feed");
+                revalidatePath("/bookmarks");
+                revalidatePath("/explore");
+                revalidatePath("/search");
             }
             return { success: true };
         } else {

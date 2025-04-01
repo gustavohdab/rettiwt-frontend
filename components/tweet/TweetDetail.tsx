@@ -36,14 +36,14 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
             {/* Author info with follow button */}
             <div className="flex items-start mb-4">
                 <Link href={`/${author.username}`} className="flex-shrink-0 mr-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
                         {author.avatar ? (
                             <Image
                                 src={getImageUrl(author.avatar)}
                                 alt={author.name || 'User avatar'}
                                 width={48}
                                 height={48}
-                                className="rounded-full"
+                                className="rounded-full object-cover w-full h-full"
                             />
                         ) : (
                             <span className="text-gray-500 text-sm font-medium">

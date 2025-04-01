@@ -100,3 +100,34 @@ export async function updateProfile(data: ApiTypes.UpdateProfileRequest) {
         };
     }
 }
+
+/**
+ * Get current authenticated user data
+ * Fetches the latest user data from the server
+ */
+export async function getCurrentUser() {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.accessToken) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        const response = await UserService.getCurrentUser(session.accessToken);
+
+        if (response.status === "success" && response.data) {
+            return {
+                success: true,
+                data: response.data.user,
+            };
+        } else {
+            console.error("API returned error for getCurrentUser:", response);
+            return {
+                success: false,
+                error: response.message || "Failed to fetch current user data",
+            };
+        }
+    } catch (error) {
+        console.error("Error in getCurrentUser action:", error);
+        return { success: false, error: "An unexpected error occurred" };
+    }
+}

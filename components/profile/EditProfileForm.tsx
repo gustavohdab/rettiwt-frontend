@@ -7,6 +7,7 @@ import { updateProfile } from "@/lib/actions/user.actions";
 import { uploadAvatar, uploadProfileHeader } from "@/lib/actions/upload.actions";
 import { useRouter } from "next/navigation";
 import getImageUrl from "@/lib/utils/getImageUrl";
+import { useSession } from "next-auth/react";
 
 interface EditProfileFormProps {
     user: User;
@@ -14,6 +15,7 @@ interface EditProfileFormProps {
 
 export default function EditProfileForm({ user }: EditProfileFormProps) {
     const router = useRouter();
+    const { update: updateSession } = useSession();
     const [formData, setFormData] = useState({
         name: user.name || "",
         bio: user.bio || "",
@@ -99,6 +101,9 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
             if (!updateResult.success) {
                 throw new Error(updateResult.error || "Failed to update profile");
             }
+
+            // Update session to refresh user data in the UI (including sidebar)
+            await updateSession();
 
             setSuccess(true);
             // Navigate back to profile page after successful update
