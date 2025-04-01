@@ -6,11 +6,13 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/actions/user-data.actions';
 import { User } from '@/types/models';
+import useAuth from '@/lib/hooks/useAuth';
 import {
     HomeIcon,
     MagnifyingGlassIcon,
     UserIcon,
-    BookmarkIcon
+    BookmarkIcon,
+    ArrowLeftOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import {
     HomeIcon as HomeIconSolid,
@@ -18,6 +20,16 @@ import {
     UserIcon as UserIconSolid,
     BookmarkIcon as BookmarkIconSolid
 } from '@heroicons/react/24/solid';
+import { ComponentType } from 'react';
+
+interface NavigationItem {
+    name: string;
+    href: string;
+    icon: ComponentType<React.SVGProps<SVGSVGElement>>;
+    activeIcon?: ComponentType<React.SVGProps<SVGSVGElement>>;
+    onClick?: () => void;
+    isLogout?: boolean;
+}
 
 interface NavigationProps {
     isOpen: boolean;
@@ -27,6 +39,7 @@ interface NavigationProps {
 export default function Navigation({ isOpen, setIsOpen }: NavigationProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const { logout } = useAuth();
     const [userData, setUserData] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -58,7 +71,7 @@ export default function Navigation({ isOpen, setIsOpen }: NavigationProps) {
     const username = userData?.username || session?.user?.username;
 
     // Reduced navigation items for mobile to avoid overcrowding
-    const navigationItems = [
+    const navigationItems: NavigationItem[] = [
         { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
         { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
         { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon, activeIcon: BookmarkIconSolid },
@@ -68,6 +81,13 @@ export default function Navigation({ isOpen, setIsOpen }: NavigationProps) {
             icon: UserIcon,
             activeIcon: UserIconSolid
         },
+        {
+            name: 'Logout',
+            href: '#',
+            icon: ArrowLeftOnRectangleIcon,
+            onClick: logout,
+            isLogout: true
+        }
     ];
 
     // Check if we're on a profile page
@@ -79,7 +99,20 @@ export default function Navigation({ isOpen, setIsOpen }: NavigationProps) {
                 const isActive = item.name === 'Profile'
                     ? isProfileActive
                     : pathname === item.href;
-                const Icon = isActive ? item.activeIcon : item.icon;
+                const Icon = isActive && item.activeIcon ? item.activeIcon : item.icon;
+
+                if (item.isLogout) {
+                    return (
+                        <button
+                            key={item.name}
+                            onClick={item.onClick}
+                            className="flex flex-col items-center justify-center px-2 py-1 sm:py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                        >
+                            <Icon className="w-6 h-6 sm:w-7 sm:h-7" aria-hidden="true" />
+                            <span className="mt-1 text-xs sm:text-sm font-medium">{item.name}</span>
+                        </button>
+                    );
+                }
 
                 return (
                     <Link
