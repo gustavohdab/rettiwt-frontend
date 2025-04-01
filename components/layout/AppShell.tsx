@@ -37,7 +37,7 @@ export default function AppShell({ children }: AppShellProps) {
 
             {/* Main content - with responsive padding and width */}
             <main className="min-h-screen pb-16 md:pb-0">
-                <div className="w-full mx-auto px-4 sm:px-6 md:px-8 py-4 md:py-6">
+                <div className="w-full mx-auto px-4 sm:px-6 md:px-8">
                     <div className="max-w-full md:max-w-2xl lg:max-w-3xl xl:max-w-[100rem] mx-auto">
                         {children}
                     </div>

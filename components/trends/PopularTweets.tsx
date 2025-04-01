@@ -7,7 +7,7 @@ import trendsService from "@/lib/api/services/trends.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import TweetCard from "@/components/tweet/TweetCard";
 import { useAuth } from "@/lib/hooks/useAuth";
-
+import Header from "@/components/layout/Header";
 interface PopularTweetsProps {
     initialTweets?: Tweet[];
 }
@@ -103,7 +103,7 @@ export default function PopularTweets({ initialTweets }: PopularTweetsProps) {
 
     return (
         <div>
-            <h2 className="text-xl font-bold p-4">Popular Tweets</h2>
+            <Header title="Popular Tweets" showSearch={false} />
 
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {tweets.map((tweet) => (

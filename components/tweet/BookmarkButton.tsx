@@ -59,4 +59,4 @@ export default function BookmarkButton({ tweetId, initialBookmarked = false }: B
             )}
         </button>
     );
-} 
+}

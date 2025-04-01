@@ -9,10 +9,10 @@ import BackButton from '@/components/shared/BackButton';
 interface HeaderProps {
     title?: string;
     showBackButton?: boolean;
-    showSearch?: boolean;
+    showSearch?: boolean
 }
 
-export default function Header({ title, showBackButton = false, showSearch = true }: HeaderProps) {
+export default function Header({ title, showBackButton = false, showSearch = false }: HeaderProps) {
     const pathname = usePathname();
 
     // Don't show search on the search page itself
