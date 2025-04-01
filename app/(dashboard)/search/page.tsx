@@ -10,7 +10,7 @@ import { Metadata } from 'next';
 interface SearchPageProps {
     searchParams: Promise<{
         q?: string;
-        type?: 'users' | 'tweets' | 'all';
+        type?: 'users' | 'tweets' | 'hashtags' | 'all';
         page?: string;
     }>;
 }
@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const session = await getServerSession(authOptions);
     const params = await searchParams;
     const query = params.q || '';
-    const type = (params.type as 'users' | 'tweets' | 'all') || 'all';
+    const type = (params.type as 'users' | 'tweets' | 'hashtags' | 'all') || 'all';
     const page = parseInt(params.page || '1');
     const limit = 10;
 

@@ -4,9 +4,11 @@ import { ApiTypes, Tweet, User, normalizeTweet, normalizeUser } from "@/types";
 export interface SearchResults {
     users?: User[];
     tweets?: Tweet[];
+    hashtags?: string[];
     counts?: {
         users: number;
         tweets: number;
+        hashtags: number;
         total: number;
     };
 }
@@ -16,16 +18,16 @@ export interface SearchResults {
  */
 const SearchService = {
     /**
-     * Search for users, tweets or both
+     * Search for users, tweets, hashtags or all
      * @param query Search query string
-     * @param type Type of search (users, tweets, all)
+     * @param type Type of search (users, tweets, hashtags, all)
      * @param page Page number
      * @param limit Items per page
      * @param accessToken Optional auth token for server components
      */
     search: async (
         query: string,
-        type: "users" | "tweets" | "all" = "all",
+        type: "users" | "tweets" | "hashtags" | "all" = "all",
         page = 1,
         limit = 10,
         accessToken?: string
@@ -51,9 +53,11 @@ const SearchService = {
                     results: {
                         users?: ApiTypes.User[];
                         tweets?: ApiTypes.Tweet[];
+                        hashtags?: string[];
                         counts?: {
                             users: number;
                             tweets: number;
+                            hashtags: number;
                             total: number;
                         };
                     };
@@ -73,6 +77,10 @@ const SearchService = {
                 if (response.data.data.results.tweets) {
                     normalized.tweets =
                         response.data.data.results.tweets.map(normalizeTweet);
+                }
+
+                if (response.data.data.results.hashtags) {
+                    normalized.hashtags = response.data.data.results.hashtags;
                 }
 
                 if (response.data.data.results.counts) {

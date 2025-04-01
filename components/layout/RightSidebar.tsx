@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import SearchInput from '../search/SearchInput';
 import TrendingHashtags from '../trends/TrendingHashtags';
 import WhoToFollow from '../trends/WhoToFollow';
@@ -25,13 +26,9 @@ export default function RightSidebar() {
 
             {/* Footer */}
             <div className="mt-4 px-4 text-xs text-[var(--secondary)]">
-                <span className="mr-2 hover:underline cursor-pointer">Terms of Service</span>
-                <span className="mr-2 hover:underline cursor-pointer">Privacy Policy</span>
-                <span className="mr-2 hover:underline cursor-pointer">Cookie Policy</span>
-                <span className="mr-2 hover:underline cursor-pointer">Accessibility</span>
-                <span className="mr-2 hover:underline cursor-pointer">Ads info</span>
-                <span className="hover:underline cursor-pointer">More</span>
-                <div className="mt-1">© 2023 Twitter Clone</div>
+                <span>
+                    &copy; {new Date().getFullYear()} Twitter Clone by <Link href="https://github.com/gustavohdab" className="hover:underline text-[var(--accent)]">Gustavo Batista</Link>
+                </span>
             </div>
         </div>
     );

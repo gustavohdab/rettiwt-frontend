@@ -5,7 +5,7 @@ import { SearchResults } from '@/lib/api/services/search.service';
 
 interface SearchTabsProps {
     query: string;
-    activeType: 'users' | 'tweets' | 'all';
+    activeType: 'users' | 'tweets' | 'all' | 'hashtags';
     counts?: SearchResults['counts'];
 }
 
@@ -14,6 +14,7 @@ export default function SearchTabs({ query, activeType, counts }: SearchTabsProp
         { id: 'all', label: 'All', count: counts?.total || 0 },
         { id: 'users', label: 'Users', count: counts?.users || 0 },
         { id: 'tweets', label: 'Tweets', count: counts?.tweets || 0 },
+        { id: 'hashtags', label: 'Hashtags', count: counts?.hashtags || 0 },
     ];
 
     return (
@@ -24,8 +25,8 @@ export default function SearchTabs({ query, activeType, counts }: SearchTabsProp
                         key={tab.id}
                         href={`/search?q=${encodeURIComponent(query)}&type=${tab.id}`}
                         className={`px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap ${activeType === tab.id
-                                ? 'text-blue-600 border-b-2 border-blue-600'
-                                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                            ? 'text-blue-600 border-b-2 border-blue-600'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                             }`}
                     >
                         {tab.label}

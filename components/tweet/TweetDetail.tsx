@@ -8,6 +8,7 @@ import { ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
+import TweetContent from './TweetContent';
 
 interface TweetDetailProps {
     tweet: Tweet;
@@ -80,7 +81,7 @@ export default function TweetDetail({ tweet, currentUserId }: TweetDetailProps) 
 
             {/* Tweet content */}
             <div className="mb-4 text-xl">
-                {text}
+                <TweetContent content={text} />
             </div>
 
             {/* Media if present */}

@@ -109,7 +109,7 @@ export interface UpdateProfileRequest {
 // Search types
 export interface SearchRequest {
     query: string;
-    type?: "tweet" | "user" | "hashtag";
+    type?: "tweet" | "user" | "hashtag" | "all";
     page?: number;
     limit?: number;
 }
@@ -118,6 +118,12 @@ export interface SearchResponse {
     tweets?: Tweet[];
     users?: User[];
     hashtags?: string[];
+    counts?: {
+        users: number;
+        tweets: number;
+        hashtags: number;
+        total: number;
+    };
     pagination: PaginationInfo;
 }
 

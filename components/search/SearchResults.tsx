@@ -5,13 +5,15 @@ import { SearchResults as SearchResultsType } from '@/lib/api/services/search.se
 import TweetCard from '@/components/tweet/TweetCard';
 import UserCard from '@/components/user/UserCard';
 import { ApiTypes } from '@/types';
+import { PaginationInfo } from '@/types/api';
+import { HashtagIcon } from '@heroicons/react/24/outline';
 
 interface SearchResultsProps {
     results: SearchResultsType;
-    type: 'users' | 'tweets' | 'all';
+    type: 'users' | 'tweets' | 'all' | 'hashtags';
     query: string;
     page: number;
-    pagination: ApiTypes.PaginationInfo;
+    pagination: PaginationInfo;
     currentUserId?: string;
 }
 
@@ -24,7 +26,8 @@ export default function SearchResults({
     currentUserId
 }: SearchResultsProps) {
     const hasResults = (results.users && results.users.length > 0) ||
-        (results.tweets && results.tweets.length > 0);
+        (results.tweets && results.tweets.length > 0) ||
+        (results.hashtags && results.hashtags.length > 0);
 
     if (!hasResults) {
         return (
@@ -92,6 +95,40 @@ export default function SearchResults({
                                 className="text-blue-500 hover:underline"
                             >
                                 View all tweets
+                            </Link>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Hashtags section */}
+            {(type === 'hashtags' || type === 'all') && results.hashtags && results.hashtags.length > 0 && (
+                <div className="mb-8">
+                    {type === 'all' && (
+                        <h2 className="text-xl font-bold mb-4">Hashtags</h2>
+                    )}
+                    <div className="space-y-4">
+                        {results.hashtags.map(hashtag => (
+                            <div key={hashtag} className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                <Link
+                                    href={`/hashtag/${hashtag}`}
+                                    className="flex items-center"
+                                >
+                                    <div className="mr-3 p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
+                                        <HashtagIcon className="h-5 w-5 text-blue-500" />
+                                    </div>
+                                    <span className="text-lg font-medium">#{hashtag}</span>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                    {type === 'all' && results.counts && results.counts.hashtags > results.hashtags.length && (
+                        <div className="mt-4 text-center">
+                            <Link
+                                href={`/search?q=${encodeURIComponent(query)}&type=hashtags`}
+                                className="text-blue-500 hover:underline"
+                            >
+                                View all hashtags
                             </Link>
                         </div>
                     )}

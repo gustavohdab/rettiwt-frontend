@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import BookmarkButton from './BookmarkButton';
+import TweetContent from './TweetContent';
 
 export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCardProps) {
     const router = useRouter();
@@ -164,8 +165,8 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                     </div>
 
                     {/* Tweet text */}
-                    <div className="mb-4 text-[var(--foreground)] whitespace-pre-wrap text-base sm:text-lg leading-relaxed">
-                        {displayTweet.content}
+                    <div className="mb-4 text-[var(--foreground)]">
+                        <TweetContent content={displayTweet.content} />
                     </div>
 
                     {/* Tweet images */}

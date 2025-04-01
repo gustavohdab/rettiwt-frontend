@@ -156,6 +156,23 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
     const isOverLimit = remainingChars < 0;
     const isDisabled = isOverLimit || (!content.trim() && selectedImages.length === 0) || isPending || isUploading;
 
+    // Add this new function for highlighting hashtags
+    const renderContentWithHighlightedHashtags = () => {
+        if (!content) return null;
+
+        const words = content.split(/\b/);
+        return words.map((word, index) => {
+            if (word.startsWith('#') && word.length > 1) {
+                return (
+                    <span key={index} className="text-blue-500">
+                        {word}
+                    </span>
+                );
+            }
+            return <span key={index}>{word}</span>;
+        });
+    };
+
     if (!session?.user) {
         return null;
     }
@@ -185,13 +202,18 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                 {/* Tweet input area */}
                 <div className="flex-1 min-w-0">
                     {/* Text area */}
-                    <textarea
-                        placeholder={placeholder}
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full border-0 focus:ring-0 text-lg placeholder-gray-500 tracking-wide min-h-[100px] bg-transparent resize-none"
-                        maxLength={290} // Allow a bit extra to show the counter going negative
-                    />
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-0 opacity-0">
+                            {renderContentWithHighlightedHashtags()}
+                        </div>
+                        <textarea
+                            placeholder={placeholder}
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            className="w-full border-0 focus:ring-0 text-lg placeholder-gray-500 tracking-wide min-h-[100px] bg-transparent resize-none"
+                            maxLength={290}
+                        />
+                    </div>
 
                     {/* Error message */}
                     {error && (
