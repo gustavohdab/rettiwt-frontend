@@ -1,8 +1,8 @@
+import AuthService from "@/lib/api/services/auth.service";
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import AuthService from "@/lib/api/services/auth.service";
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
