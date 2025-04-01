@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function FeedPage() {
     return (
-        <div>
+        <>
             <Header title="Home" showSearch={false} />
 
             {/* Tweet composer and timeline are managed together in TweetList */}
             <Suspense fallback={
-                <div>
+                <>
                     <div className="border-b p-4">
                         <div className="animate-pulse h-24 rounded"></div>
                     </div>
@@ -25,10 +25,10 @@ export default function FeedPage() {
                             <TweetSkeleton key={i} />
                         ))}
                     </div>
-                </div>
+                </>
             }>
                 <TweetList />
             </Suspense>
-        </div>
+        </>
     );
 } 

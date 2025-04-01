@@ -9,16 +9,12 @@ import { User } from '@/types/models';
 import {
     HomeIcon,
     MagnifyingGlassIcon,
-    BellIcon,
-    EnvelopeIcon,
     UserIcon,
     BookmarkIcon
 } from '@heroicons/react/24/outline';
 import {
     HomeIcon as HomeIconSolid,
     MagnifyingGlassIcon as MagnifyingGlassIconSolid,
-    BellIcon as BellIconSolid,
-    EnvelopeIcon as EnvelopeIconSolid,
     UserIcon as UserIconSolid,
     BookmarkIcon as BookmarkIconSolid
 } from '@heroicons/react/24/solid';

@@ -1,40 +1,33 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
-import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/actions/user-data.actions';
-import {
-    HomeIcon,
-    MagnifyingGlassIcon,
-    BellIcon,
-    EnvelopeIcon,
-    UserIcon,
-    BookmarkIcon,
-    EllipsisHorizontalCircleIcon,
-    ArrowLeftOnRectangleIcon,
-    HashtagIcon
-} from '@heroicons/react/24/outline';
-import {
-    HomeIcon as HomeIconSolid,
-    MagnifyingGlassIcon as MagnifyingGlassIconSolid,
-    HashtagIcon as HashtagIconSolid,
-    UserIcon as UserIconSolid
-} from '@heroicons/react/24/solid';
 import getImageUrl from '@/lib/utils/getImageUrl';
 import { User } from '@/types/models';
-import TweetModal from '../modals/TweetModal';
+import {
+    ArrowLeftOnRectangleIcon,
+    BookmarkIcon,
+    HashtagIcon,
+    HomeIcon,
+    MagnifyingGlassIcon,
+    UserIcon
+} from '@heroicons/react/24/outline';
+import {
+    HashtagIcon as HashtagIconSolid,
+    HomeIcon as HomeIconSolid,
+    MagnifyingGlassIcon as MagnifyingGlassIconSolid,
+    UserIcon as UserIconSolid
+} from '@heroicons/react/24/solid';
+import { signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const navigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
     { name: 'Explore', href: '/explore', icon: HashtagIcon, activeIcon: HashtagIconSolid },
     { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
-    { name: 'Notifications', href: '/notifications', icon: BellIcon },
-    { name: 'Messages', href: '/messages', icon: EnvelopeIcon },
     { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon },
-    { name: 'More', href: '/more', icon: EllipsisHorizontalCircleIcon },
 ];
 
 export default function Sidebar() {
@@ -42,8 +35,6 @@ export default function Sidebar() {
     const { data: session } = useSession();
     const [userData, setUserData] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isTweetModalOpen, setIsTweetModalOpen] = useState(false);
-
     // Fetch the current user data from the server
     useEffect(() => {
         const fetchUserData = async () => {
@@ -127,15 +118,6 @@ export default function Sidebar() {
                             );
                         })}
                     </nav>
-
-                    {/* Tweet Button */}
-                    <button
-                        type="button"
-                        onClick={() => setIsTweetModalOpen(true)}
-                        className="mt-6 w-full bg-white text-black px-4 py-3 lg:py-4 rounded-full font-bold hover:bg-opacity-90 transition duration-200"
-                    >
-                        Tweet
-                    </button>
                 </div>
 
                 {/* User Profile */}
@@ -181,13 +163,6 @@ export default function Sidebar() {
                     </div>
                 )}
             </div>
-
-            {/* Tweet Modal using Portal */}
-            <TweetModal
-                isOpen={isTweetModalOpen}
-                onClose={() => setIsTweetModalOpen(false)}
-                onSuccess={() => setIsTweetModalOpen(false)}
-            />
         </div>
     );
 }

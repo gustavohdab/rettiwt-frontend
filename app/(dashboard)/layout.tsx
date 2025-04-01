@@ -22,8 +22,8 @@ export default function DashboardLayout({
                 </aside>
 
                 {/* Main Content - Responsive width */}
-                <main className="flex-1 border-x border-gray-800 px-4 sm:px-8">
-                    <div className="max-w-2xl mx-auto">{children}</div>
+                <main className="flex-1 border-x border-gray-800">
+                    <div className="max-w-2xl mx-auto w-full">{children}</div>
                 </main>
 
                 {/* Right Sidebar - Hidden on mobile */}

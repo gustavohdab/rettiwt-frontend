@@ -40,7 +40,7 @@ export default async function EditProfilePage({
     const user = response.data.user;
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="w-full">
             <div className="border-b border-gray-200 dark:border-gray-800 px-4 py-3">
                 <h1 className="text-xl font-bold">Edit profile</h1>
             </div>

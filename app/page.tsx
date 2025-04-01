@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-4">
+    <div className="min-h-screen flex items-center justify-center px-4 ">
       <div className="max-w-lg w-full mx-auto text-center">
         <h1 className="text-5xl font-bold mb-6">Rettiwt</h1>
         <p className="text-xl mb-8">
