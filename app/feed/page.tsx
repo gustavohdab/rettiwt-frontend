@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import TweetComposer from '@/components/tweet/TweetComposer';
 import TweetList from '@/components/tweet/TweetList';
 import TweetSkeleton from '@/components/tweet/TweetSkeleton';
 import { Metadata } from 'next';
@@ -14,17 +13,17 @@ export default function FeedPage() {
         <div>
             <h1 className="text-xl font-bold p-4 border-b border-gray-200 dark:border-gray-800">Home</h1>
 
-            {/* Tweet composer section */}
-            <div className="border-b border-gray-200 dark:border-gray-800">
-                <TweetComposer />
-            </div>
-
-            {/* Timeline with suspense for loading state */}
+            {/* Tweet composer and timeline are managed together in TweetList */}
             <Suspense fallback={
-                <div className="divide-y divide-gray-200 dark:divide-gray-800">
-                    {[...Array(5)].map((_, i) => (
-                        <TweetSkeleton key={i} />
-                    ))}
+                <div>
+                    <div className="border-b border-gray-200 dark:border-gray-800 p-4">
+                        <div className="animate-pulse h-24 bg-gray-100 dark:bg-gray-800 rounded"></div>
+                    </div>
+                    <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                        {[...Array(5)].map((_, i) => (
+                            <TweetSkeleton key={i} />
+                        ))}
+                    </div>
                 </div>
             }>
                 <TweetList />

@@ -108,13 +108,13 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                 // Revoke all object URLs to prevent memory leaks
                 selectedImagesPreview.forEach(url => URL.revokeObjectURL(url));
 
-                // Call onSuccess callback if provided
+                // Call onSuccess callback if provided (this will handle adding the tweet to the timeline)
                 if (onSuccess && result.data) {
                     onSuccess(result.data);
                 }
 
-                // Refresh the page to see the new tweet
-                router.refresh();
+                // Don't need to refresh the page since we'll handle the update with onSuccess
+                // router.refresh();
             });
         });
     };
