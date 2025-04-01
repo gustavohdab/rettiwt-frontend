@@ -6,12 +6,15 @@ import Link from "next/link";
 import { RecommendedUser } from "@/types/models";
 import trendsService from "@/lib/api/services/trends.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import FollowButton from "@/components/profile/FollowButton";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface WhoToFollowProps {
     initialUsers?: RecommendedUser[];
 }
 
 export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
+    const { user: currentUser } = useAuth();
     const [users, setUsers] = useState<RecommendedUser[]>(initialUsers || []);
     const [loading, setLoading] = useState(!initialUsers);
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +26,11 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
                     setLoading(true);
                     const response = await trendsService.getRecommendedUsers();
                     if (response.status === "success" && response.data) {
-                        setUsers(response.data.users as RecommendedUser[]);
+                        // Filter out current user if somehow included
+                        const filteredUsers = response.data.users.filter(
+                            user => !currentUser || user.username !== currentUser.username
+                        );
+                        setUsers(filteredUsers as RecommendedUser[]);
                     } else {
                         setError("Failed to load recommended users");
                     }
@@ -36,7 +43,7 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
 
             fetchRecommendedUsers();
         }
-    }, [initialUsers]);
+    }, [initialUsers, currentUser]);
 
     if (loading) {
         return (
@@ -95,11 +102,11 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
                                 <p className="text-gray-500 text-xs truncate">@{user.username}</p>
                             </Link>
                         </div>
-                        <button
-                            className="bg-black text-white dark:bg-white dark:text-black rounded-full px-4 py-1.5 text-sm font-medium hover:bg-opacity-90 transition"
-                        >
-                            Follow
-                        </button>
+                        <FollowButton
+                            username={user.username}
+                            initialFollowing={false}
+                            size="sm"
+                        />
                     </div>
                 ))}
             </div>

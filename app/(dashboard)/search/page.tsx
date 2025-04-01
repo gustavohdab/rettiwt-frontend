@@ -8,17 +8,18 @@ import SearchInput from '@/components/search/SearchInput';
 import { Metadata } from 'next';
 
 interface SearchPageProps {
-    searchParams: {
+    searchParams: Promise<{
         q?: string;
         type?: 'users' | 'tweets' | 'all';
         page?: string;
-    };
+    }>;
 }
 
-export function generateMetadata({ searchParams }: SearchPageProps): Metadata {
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+    const params = await searchParams;
     return {
-        title: searchParams.q
-            ? `${searchParams.q} - Search / Twitter Clone`
+        title: params.q
+            ? `${params.q} - Search / Twitter Clone`
             : 'Search / Twitter Clone',
         description: 'Search for users and tweets',
     };
@@ -26,9 +27,10 @@ export function generateMetadata({ searchParams }: SearchPageProps): Metadata {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
     const session = await getServerSession(authOptions);
-    const query = searchParams.q || '';
-    const type = (searchParams.type as 'users' | 'tweets' | 'all') || 'all';
-    const page = parseInt(searchParams.page || '1');
+    const params = await searchParams;
+    const query = params.q || '';
+    const type = (params.type as 'users' | 'tweets' | 'all') || 'all';
+    const page = parseInt(params.page || '1');
     const limit = 10;
 
     if (!query) {

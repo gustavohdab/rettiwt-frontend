@@ -366,7 +366,7 @@ const TweetService = {
 
             const response = await api.get<
                 ApiTypes.ApiResponse<ApiTypes.TimelineResponse>
-            >(`/users/${username}/tweets`, config);
+            >(`/tweets/user/${username}`, config);
 
             // Transform API response to UI model
             if (response.data.status === "success" && response.data.data) {
@@ -387,16 +387,17 @@ const TweetService = {
     },
 
     /**
-     * Get user replies
-     * @param username Username
-     * @param page Page number
-     * @param limit Items per page
-     * @param accessToken Optional auth token for server components
+     * Get tweets that are replies from a specific user
+     * @param username The username of the user
+     * @param page The page to fetch (default: 1)
+     * @param limit The number of tweets per page (default: 10)
+     * @param accessToken Optional access token for authorization
+     * @returns Promise with the user replies response
      */
     getUserReplies: async (
         username: string,
-        page = 1,
-        limit = 20,
+        page: number = 1,
+        limit: number = 10,
         accessToken?: string
     ): Promise<
         ApiTypes.ApiResponse<{
@@ -406,7 +407,10 @@ const TweetService = {
     > => {
         try {
             const config: any = {
-                params: { page, limit },
+                params: {
+                    page,
+                    limit,
+                },
             };
 
             if (accessToken) {
@@ -417,10 +421,13 @@ const TweetService = {
 
             const response = await api.get<
                 ApiTypes.ApiResponse<ApiTypes.TimelineResponse>
-            >(`/users/${username}/replies`, config);
+            >(`/tweets/user/${username}/replies`, config);
 
-            // Transform API response to UI model
-            if (response.data.status === "success" && response.data.data) {
+            if (
+                response.data &&
+                response.data.status === "success" &&
+                response.data.data
+            ) {
                 return {
                     status: "success",
                     data: {
@@ -430,10 +437,18 @@ const TweetService = {
                 };
             }
 
-            return response.data as any;
-        } catch (error) {
-            console.error(`Error getting replies for user ${username}:`, error);
-            return { status: "error", message: "Failed to get user replies" };
+            return {
+                status: "error",
+                message: "Failed to fetch user replies",
+            };
+        } catch (error: any) {
+            console.error("Error fetching user replies:", error);
+            return {
+                status: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to fetch user replies",
+            };
         }
     },
 
@@ -608,6 +623,130 @@ const TweetService = {
         } catch (error) {
             console.error("Error getting bookmarks:", error);
             return { status: "error", message: "Failed to get bookmarks" };
+        }
+    },
+
+    /**
+     * Get user tweets with media
+     * @param username Username
+     * @param page Page number
+     * @param limit Items per page
+     * @param accessToken Optional auth token for server components
+     */
+    getUserMediaTweets: async (
+        username: string,
+        page = 1,
+        limit = 20,
+        accessToken?: string
+    ): Promise<
+        ApiTypes.ApiResponse<{
+            tweets: Tweet[];
+            pagination: ApiTypes.PaginationInfo;
+        }>
+    > => {
+        try {
+            const config: any = {
+                params: { page, limit, mediaOnly: true },
+            };
+
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            const response = await api.get<
+                ApiTypes.ApiResponse<ApiTypes.TimelineResponse>
+            >(`/tweets/user/${username}`, config);
+
+            // Transform API response to UI model
+            if (response.data.status === "success" && response.data.data) {
+                return {
+                    status: "success",
+                    data: {
+                        tweets: response.data.data.tweets.map(normalizeTweet),
+                        pagination: response.data.data.pagination,
+                    },
+                };
+            }
+
+            return response.data as any;
+        } catch (error) {
+            console.error(
+                `Error getting media tweets for user ${username}:`,
+                error
+            );
+            return {
+                status: "error",
+                message: "Failed to get user media tweets",
+            };
+        }
+    },
+
+    /**
+     * Get tweets that a user has liked
+     * @param username The username of the user
+     * @param page The page to fetch (default: 1)
+     * @param limit The number of tweets per page (default: 10)
+     * @param accessToken Optional access token for authorization
+     * @returns Promise with the liked tweets response
+     */
+    getUserLikedTweets: async (
+        username: string,
+        page: number = 1,
+        limit: number = 10,
+        accessToken?: string
+    ): Promise<
+        ApiTypes.ApiResponse<{
+            tweets: Tweet[];
+            pagination: ApiTypes.PaginationInfo;
+        }>
+    > => {
+        try {
+            const config: any = {
+                params: {
+                    page,
+                    limit,
+                },
+            };
+
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            // This endpoint may need to be added to the backend
+            const response = await api.get<
+                ApiTypes.ApiResponse<ApiTypes.TimelineResponse>
+            >(`/tweets/user/${username}/likes`, config);
+
+            if (
+                response.data &&
+                response.data.status === "success" &&
+                response.data.data
+            ) {
+                return {
+                    status: "success",
+                    data: {
+                        tweets: response.data.data.tweets.map(normalizeTweet),
+                        pagination: response.data.data.pagination,
+                    },
+                };
+            }
+
+            return {
+                status: "error",
+                message: "Failed to fetch user liked tweets",
+            };
+        } catch (error: any) {
+            console.error("Error fetching user liked tweets:", error);
+            return {
+                status: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to fetch user liked tweets",
+            };
         }
     },
 };

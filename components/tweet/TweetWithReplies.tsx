@@ -1,13 +1,13 @@
-import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import TweetService from '@/lib/api/services/tweet.service';
-import TweetDetail from '@/components/tweet/TweetDetail';
-import ReplyComposer from '@/components/tweet/ReplyComposer';
 import RepliesList from '@/components/tweet/RepliesList';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import ReplyComposer from '@/components/tweet/ReplyComposer';
+import TweetDetail from '@/components/tweet/TweetDetail';
+import TweetService from '@/lib/api/services/tweet.service';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { getServerSession } from 'next-auth';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import BackButton from '../shared/BackButton';
 
 interface TweetWithRepliesProps {
     tweetId: string;
@@ -41,12 +41,7 @@ export default async function TweetWithReplies({ tweetId }: TweetWithRepliesProp
         return (
             <div>
                 {/* Header with back button */}
-                <div className="sticky top-0 z-10 bg-white dark:bg-black p-4 border-b border-gray-200 dark:border-gray-800 flex items-center">
-                    <Link href="/feed" className="mr-4">
-                        <ArrowLeftIcon className="h-5 w-5" />
-                    </Link>
-                    <h1 className="text-xl font-bold">Tweet</h1>
-                </div>
+                <BackButton title="Tweet" />
 
                 {/* Parent tweet if this is a reply */}
                 {parentTweet && (

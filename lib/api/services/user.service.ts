@@ -42,6 +42,42 @@ const UserService = {
     },
 
     /**
+     * Get current authenticated user profile
+     * @param accessToken Optional access token for server components
+     */
+    getCurrentUser: async (
+        accessToken?: string
+    ): Promise<ApiTypes.ApiResponse<{ user: User }>> => {
+        try {
+            const config = accessToken
+                ? { headers: { Authorization: `Bearer ${accessToken}` } }
+                : undefined;
+
+            const response = await api.get<
+                ApiTypes.ApiResponse<{ user: ApiTypes.User }>
+            >("/auth/me", config);
+
+            // Transform API response to UI model
+            if (
+                response.data.status === "success" &&
+                response.data.data?.user
+            ) {
+                return {
+                    status: "success",
+                    data: {
+                        user: normalizeUser(response.data.data.user),
+                    },
+                };
+            }
+
+            return response.data as any;
+        } catch (error) {
+            console.error("Error getting current user:", error);
+            return { status: "error", message: "Failed to get current user" };
+        }
+    },
+
+    /**
      * Update the authenticated user's profile
      * @param profileData Profile data to update
      */
@@ -81,11 +117,18 @@ const UserService = {
      * @param username Username to follow
      */
     followUser: async (
-        username: string
+        username: string,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<void>> => {
         try {
             const response = await api.post<ApiTypes.ApiResponse<void>>(
-                `/users/${username}/follow`
+                `/users/${username}/follow`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
             );
             return response.data;
         } catch (error) {
@@ -99,15 +142,52 @@ const UserService = {
      * @param username Username to unfollow
      */
     unfollowUser: async (
-        username: string
+        username: string,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<void>> => {
         try {
-            const response = await api.delete<ApiTypes.ApiResponse<void>>(
-                `/users/${username}/follow`
+            console.log(
+                `UserService: Sending unfollow request for ${username}`
             );
+
+            if (!accessToken) {
+                console.error("No access token provided for unfollow request");
+                return {
+                    status: "error",
+                    message: "No authentication token provided",
+                };
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            };
+
+            console.log(`UserService: Using config`, JSON.stringify(config));
+
+            const response = await api.delete<ApiTypes.ApiResponse<void>>(
+                `/users/${username}/follow`,
+                config
+            );
+
+            console.log(
+                `UserService: Unfollow response status: ${response.status}, data:`,
+                response.data
+            );
+
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Error unfollowing user ${username}:`, error);
+
+            // More detailed error logging
+            if (error.response) {
+                console.error(
+                    `Response error status: ${error.response.status}`
+                );
+                console.error(`Response data:`, error.response.data);
+            }
+
             return { status: "error", message: "Failed to unfollow user" };
         }
     },
@@ -117,12 +197,17 @@ const UserService = {
      * @param username Username
      */
     getUserFollowers: async (
-        username: string
+        username: string,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<{ followers: User[] }>> => {
         try {
+            const config = accessToken
+                ? { headers: { Authorization: `Bearer ${accessToken}` } }
+                : undefined;
+
             const response = await api.get<
                 ApiTypes.ApiResponse<{ followers: ApiTypes.User[] }>
-            >(`/users/${username}/followers`);
+            >(`/users/${username}/followers`, config);
 
             // Transform API response to UI model
             if (
@@ -150,12 +235,17 @@ const UserService = {
      * @param username Username
      */
     getUserFollowing: async (
-        username: string
+        username: string,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<{ following: User[] }>> => {
         try {
+            const config = accessToken
+                ? { headers: { Authorization: `Bearer ${accessToken}` } }
+                : undefined;
+
             const response = await api.get<
                 ApiTypes.ApiResponse<{ following: ApiTypes.User[] }>
-            >(`/users/${username}/following`);
+            >(`/users/${username}/following`, config);
 
             // Transform API response to UI model
             if (
@@ -187,13 +277,19 @@ const UserService = {
     searchUsers: async (
         query: string,
         page = 1,
-        limit = 10
+        limit = 10,
+        accessToken?: string
     ): Promise<ApiTypes.ApiResponse<{ users: User[] }>> => {
         try {
+            const config = accessToken
+                ? { headers: { Authorization: `Bearer ${accessToken}` } }
+                : undefined;
+
             const response = await api.get<
                 ApiTypes.ApiResponse<{ users: ApiTypes.User[] }>
             >("/users/search", {
                 params: { query, page, limit },
+                ...config,
             });
 
             // Transform API response to UI model

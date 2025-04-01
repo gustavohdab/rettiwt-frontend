@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { BookmarkIcon } from '@heroicons/react/24/outline';
 import { Metadata } from 'next';
+import BackButton from '@/components/shared/BackButton';
 
 export const metadata: Metadata = {
     title: 'Bookmarks / Twitter Clone',
@@ -38,12 +39,7 @@ export default async function BookmarksPage() {
 
         return (
             <div>
-                <div className="sticky top-0 z-10 bg-white dark:bg-black p-4 border-b border-gray-200 dark:border-gray-800 flex items-center">
-                    <Link href="/feed" className="mr-4">
-                        <ArrowLeftIcon className="h-5 w-5" />
-                    </Link>
-                    <h1 className="text-xl font-bold">Bookmarks</h1>
-                </div>
+                <BackButton title="Bookmarks" />
 
                 {bookmarks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 text-center text-gray-500">

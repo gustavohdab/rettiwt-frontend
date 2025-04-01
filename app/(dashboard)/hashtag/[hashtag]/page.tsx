@@ -4,20 +4,21 @@ import WhoToFollow from "@/components/trends/WhoToFollow";
 import HashtagPage from "@/components/trends/HashtagPage";
 
 type Props = {
-    params: {
+    params: Promise<{
         hashtag: string;
-    };
+    }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { hashtag } = await params;
     return {
-        title: `#${params.hashtag} | Twitter Clone`,
-        description: `Explore tweets with the hashtag #${params.hashtag}`,
+        title: `#${hashtag} | Twitter Clone`,
+        description: `Explore tweets with the hashtag #${hashtag}`,
     };
 }
 
-export default function HashtagPageRoute({ params }: Props) {
-    const { hashtag } = params;
+export default async function HashtagPageRoute({ params }: Props) {
+    const { hashtag } = await params;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

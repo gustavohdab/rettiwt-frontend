@@ -8,12 +8,14 @@ export const metadata: Metadata = {
 };
 
 interface TweetPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
-export default function TweetPage({ params }: TweetPageProps) {
+export default async function TweetPage({ params }: TweetPageProps) {
+    const { id } = await params;
+
     return (
         <div>
             <Suspense fallback={
@@ -21,7 +23,7 @@ export default function TweetPage({ params }: TweetPageProps) {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                 </div>
             }>
-                <TweetWithReplies tweetId={params.id} />
+                <TweetWithReplies tweetId={id} />
             </Suspense>
         </div>
     );

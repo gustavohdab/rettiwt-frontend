@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import SearchInput from '@/components/search/SearchInput';
+import BackButton from '@/components/shared/BackButton';
 
 interface HeaderProps {
     title?: string;
@@ -22,9 +23,9 @@ export default function Header({ title, showBackButton = false, showSearch = tru
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                     {showBackButton && (
-                        <Link href="/" className="mr-4">
+                        <button onClick={() => window.history.back()} className="mr-4">
                             <ArrowLeftIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                        </Link>
+                        </button>
                     )}
                     {title && (
                         <h1 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>

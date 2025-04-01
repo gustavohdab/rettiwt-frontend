@@ -17,9 +17,11 @@ import {
 import {
     HomeIcon as HomeIconSolid,
     MagnifyingGlassIcon as MagnifyingGlassIconSolid,
-    HashtagIcon as HashtagIconSolid
+    HashtagIcon as HashtagIconSolid,
+    UserIcon as UserIconSolid
 } from '@heroicons/react/24/solid';
 
+// Define navigation items without Profile (we'll add it dynamically)
 const navigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
     { name: 'Explore', href: '/explore', icon: HashtagIcon, activeIcon: HashtagIconSolid },
@@ -27,17 +29,31 @@ const navigationItems = [
     { name: 'Notifications', href: '/notifications', icon: BellIcon },
     { name: 'Messages', href: '/messages', icon: EnvelopeIcon },
     { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon },
-    { name: 'Profile', href: '/profile', icon: UserIcon },
     { name: 'More', href: '/more', icon: EllipsisHorizontalCircleIcon },
 ];
 
 export default function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const username = session?.user?.username;
+
+    // Create all navigation items including profile with dynamic path
+    const allNavigationItems = [
+        ...navigationItems,
+        {
+            name: 'Profile',
+            href: username ? `/${username}` : '/profile',
+            icon: UserIcon,
+            activeIcon: UserIconSolid
+        },
+    ];
 
     const handleSignOut = async () => {
         await signOut({ callbackUrl: '/' });
     };
+
+    // Check if we're on a profile page
+    const isProfileActive = username && pathname === `/${username}`;
 
     return (
         <div className="hidden lg:block w-[350px] h-screen overflow-y-auto px-4 py-4 sticky top-0">
@@ -56,8 +72,8 @@ export default function Sidebar() {
 
                 {/* Navigation Links */}
                 <nav className="space-y-1">
-                    {navigationItems.map((item) => {
-                        const isActive = pathname === item.href;
+                    {allNavigationItems.map((item) => {
+                        const isActive = item.name === 'Profile' ? isProfileActive : pathname === item.href;
                         const Icon = isActive && item.activeIcon ? item.activeIcon : item.icon;
 
                         return (
@@ -86,32 +102,38 @@ export default function Sidebar() {
             {/* User Profile */}
             {session?.user && (
                 <div className="px-3 mt-auto">
-                    <div className="flex items-center p-2 lg:p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
-                        <div className="flex-shrink-0">
-                            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                                {session.user.image ? (
-                                    <img
-                                        src={session.user.image}
-                                        alt={session.user.name || 'User'}
-                                        className="w-10 h-10 lg:w-12 lg:h-12 rounded-full"
-                                    />
-                                ) : (
-                                    <UserIcon className="w-6 h-6 lg:w-7 lg:h-7 text-gray-500" />
-                                )}
+                    <Link href={username ? `/${username}` : '/profile'}>
+                        <div className="flex items-center p-2 lg:p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                            <div className="flex-shrink-0">
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                    {session.user.image ? (
+                                        <img
+                                            src={session.user.image}
+                                            alt={session.user.name || 'User'}
+                                            className="w-10 h-10 lg:w-12 lg:h-12 rounded-full"
+                                        />
+                                    ) : (
+                                        <UserIcon className="w-6 h-6 lg:w-7 lg:h-7 text-gray-500" />
+                                    )}
+                                </div>
                             </div>
+                            <div className="ml-3 flex-1 min-w-0">
+                                <p className="text-sm lg:text-base font-medium text-gray-900 dark:text-white truncate">
+                                    {session.user.name}
+                                </p>
+                                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
+                                    @{session.user.username || 'user'}
+                                </p>
+                            </div>
+                            <button onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleSignOut();
+                            }} className="p-1 lg:p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                <ArrowLeftOnRectangleIcon className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
+                            </button>
                         </div>
-                        <div className="ml-3 flex-1 min-w-0">
-                            <p className="text-sm lg:text-base font-medium text-gray-900 dark:text-white truncate">
-                                {session.user.name}
-                            </p>
-                            <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">
-                                @{session.user.username || 'user'}
-                            </p>
-                        </div>
-                        <button onClick={handleSignOut} className="p-1 lg:p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                            <ArrowLeftOnRectangleIcon className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500" />
-                        </button>
-                    </div>
+                    </Link>
                 </div>
             )}
         </div>
