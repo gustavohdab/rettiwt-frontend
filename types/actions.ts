@@ -14,6 +14,7 @@ export interface TweetActionResponse {
     success?: boolean;
     error?: string;
     data?: Tweet;
+    bookmarked?: boolean;
 }
 
 // Tweet interactions

@@ -498,6 +498,118 @@ const TweetService = {
             return { status: "error", message: "Failed to get tweet thread" };
         }
     },
+
+    /**
+     * Bookmark a tweet
+     * @param id Tweet ID
+     * @param accessToken Optional auth token for server components
+     */
+    bookmarkTweet: async (
+        id: string,
+        accessToken?: string
+    ): Promise<ApiTypes.ApiResponse<{ bookmarked: boolean }>> => {
+        try {
+            const config: any = {};
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            const response = await api.post<
+                ApiTypes.ApiResponse<{ bookmarked: boolean }>
+            >(`/tweets/${id}/bookmark`, {}, config);
+
+            return response.data;
+        } catch (error) {
+            console.error(`Error bookmarking tweet ${id}:`, error);
+            return { status: "error", message: "Failed to bookmark tweet" };
+        }
+    },
+
+    /**
+     * Remove bookmark from a tweet
+     * @param id Tweet ID
+     * @param accessToken Optional auth token for server components
+     */
+    unbookmarkTweet: async (
+        id: string,
+        accessToken?: string
+    ): Promise<ApiTypes.ApiResponse<{ bookmarked: boolean }>> => {
+        try {
+            const config: any = {};
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            const response = await api.delete<
+                ApiTypes.ApiResponse<{ bookmarked: boolean }>
+            >(`/tweets/${id}/bookmark`, config);
+
+            return response.data;
+        } catch (error) {
+            console.error(`Error removing bookmark from tweet ${id}:`, error);
+            return {
+                status: "error",
+                message: "Failed to remove bookmark from tweet",
+            };
+        }
+    },
+
+    /**
+     * Get user's bookmarked tweets
+     * @param page Page number
+     * @param limit Items per page
+     * @param accessToken Optional auth token for server components
+     */
+    getBookmarks: async (
+        page = 1,
+        limit = 20,
+        accessToken?: string
+    ): Promise<
+        ApiTypes.ApiResponse<{
+            bookmarks: Tweet[];
+            pagination: ApiTypes.PaginationInfo;
+        }>
+    > => {
+        try {
+            const config: any = {
+                params: { page, limit },
+            };
+
+            if (accessToken) {
+                config.headers = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+            }
+
+            const response = await api.get<
+                ApiTypes.ApiResponse<{
+                    bookmarks: ApiTypes.Tweet[];
+                    pagination: ApiTypes.PaginationInfo;
+                }>
+            >("/users/bookmarks", config);
+
+            // Transform API response to UI model
+            if (response.data.status === "success" && response.data.data) {
+                return {
+                    status: "success",
+                    data: {
+                        bookmarks:
+                            response.data.data.bookmarks.map(normalizeTweet),
+                        pagination: response.data.data.pagination,
+                    },
+                };
+            }
+
+            return response.data as any;
+        } catch (error) {
+            console.error("Error getting bookmarks:", error);
+            return { status: "error", message: "Failed to get bookmarks" };
+        }
+    },
 };
 
 export default TweetService;

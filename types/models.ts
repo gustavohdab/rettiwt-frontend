@@ -42,6 +42,7 @@ export interface Tweet
     isRetweet?: boolean;
     originalTweet?: Tweet;
     retweetedBy?: User;
+    bookmarked?: boolean;
 }
 
 // Timeline response for UI

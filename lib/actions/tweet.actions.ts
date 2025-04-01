@@ -264,3 +264,65 @@ export async function createReply(
         return { error: "Failed to create reply" };
     }
 }
+
+export async function bookmarkTweet(
+    tweetId: string
+): Promise<TweetActionResponse> {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return { error: "Not authenticated" };
+        }
+
+        const response = await TweetService.bookmarkTweet(
+            tweetId,
+            session?.accessToken
+        );
+
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
+        revalidatePath("/feed");
+        revalidatePath("/bookmarks");
+
+        if (response.status === "success") {
+            return { success: true, bookmarked: true };
+        } else {
+            return { error: response.message || "Failed to bookmark tweet" };
+        }
+    } catch (error) {
+        console.error("Error bookmarking tweet:", error);
+        return { error: "Failed to bookmark tweet" };
+    }
+}
+
+export async function unbookmarkTweet(
+    tweetId: string
+): Promise<TweetActionResponse> {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session?.user) {
+            return { error: "Not authenticated" };
+        }
+
+        const response = await TweetService.unbookmarkTweet(
+            tweetId,
+            session?.accessToken
+        );
+
+        // Revalidate relevant paths
+        revalidatePath(`/tweet/${tweetId}`);
+        revalidatePath("/feed");
+        revalidatePath("/bookmarks");
+
+        if (response.status === "success") {
+            return { success: true, bookmarked: false };
+        } else {
+            return { error: response.message || "Failed to unbookmark tweet" };
+        }
+    } catch (error) {
+        console.error("Error unbookmarking tweet:", error);
+        return { error: "Failed to unbookmark tweet" };
+    }
+}
