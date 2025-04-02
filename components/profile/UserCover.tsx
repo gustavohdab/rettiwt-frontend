@@ -57,6 +57,7 @@ export default function UserCover({ profile, isCurrentUser, isFollowing, followe
             {!isCurrentUser && (
                 <div className="absolute top-4 right-4">
                     <FollowButton
+                        userId={profile._id}
                         username={profile.username}
                         initialFollowing={isFollowing}
                         className="px-4 py-1.5 rounded-full text-sm font-medium"

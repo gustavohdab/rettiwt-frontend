@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useSocket } from "@/context/SocketContext";
 import { followUser, unfollowUser } from "@/lib/actions/user.actions";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 interface FollowButtonProps {
+    userId: string;
     username: string;
     initialFollowing: boolean;
     size?: "sm" | "md" | "lg";
@@ -13,18 +15,43 @@ interface FollowButtonProps {
 }
 
 export default function FollowButton({
+    userId,
     username,
     initialFollowing,
     size = "md",
     withText = true,
     className = "",
 }: FollowButtonProps) {
-    const { user } = useAuth();
+    const { user: currentUser } = useAuth();
+    const { emitter } = useSocket();
     const [following, setFollowing] = useState(initialFollowing);
     const [isHovered, setIsHovered] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    if (user?.username === username) return null;
+    useEffect(() => {
+        const handleFollowStatusChange = (
+            data: { targetUserId: string; isFollowing: boolean }
+        ) => {
+            if (data.targetUserId === userId) {
+                console.log(`FollowButton (${username}): Received status change`, data);
+                setFollowing(data.isFollowing);
+            }
+        };
+
+        if (emitter) {
+            emitter.on('followStatusChanged', handleFollowStatusChange);
+            console.log(`FollowButton (${username}): Attached listener for followStatusChanged`);
+
+            return () => {
+                emitter.off('followStatusChanged', handleFollowStatusChange);
+                console.log(`FollowButton (${username}): Detached listener for followStatusChanged`);
+            };
+        } else {
+            console.log(`FollowButton (${username}): Emitter not available yet.`);
+        }
+    }, [emitter, userId, username]);
+
+    if (currentUser?.username === username) return null;
 
     const sizeClasses = {
         sm: "px-3 py-1.5 text-xs",
@@ -39,10 +66,18 @@ export default function FollowButton({
 
         const action = following ? unfollowUser : followUser;
         setFollowing(!following);
-        const result = await action(username);
-        if (!result.success) setFollowing(following);
-
-        setIsLoading(false);
+        try {
+            const result = await action(username);
+            if (!result.success) {
+                setFollowing(following);
+                console.error("Follow/Unfollow action failed:", result.error);
+            }
+        } catch (error: any) {
+            setFollowing(following);
+            console.error("Error during follow/unfollow action:", error?.message || error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

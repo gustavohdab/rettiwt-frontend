@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Tweet, normalizeTweet } from "@/types/models";
-import trendsService from "@/lib/api/services/trends.service";
-import { Skeleton } from "@/components/ui/skeleton";
 import TweetCard from "@/components/tweet/TweetCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import trendsService from "@/lib/api/services/trends.service";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { Tweet, normalizeTweet } from "@/types/models";
+import { useEffect, useState } from "react";
 
 interface HashtagPageProps {
     hashtag: string;

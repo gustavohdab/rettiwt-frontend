@@ -2,49 +2,18 @@
 
 import FollowButton from "@/components/profile/FollowButton";
 import { Skeleton } from "@/components/ui/skeleton";
-import trendsService from "@/lib/api/services/trends.service";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useRecommendedUsers } from "@/lib/hooks/useRecommendedUsers";
 import getImageUrl from "@/lib/utils/getImageUrl";
 import { RecommendedUser } from "@/types/models";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 interface WhoToFollowProps {
     initialUsers?: RecommendedUser[];
 }
 
 export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
-    const { user: currentUser } = useAuth();
-    const [users, setUsers] = useState<RecommendedUser[]>(initialUsers || []);
-    const [loading, setLoading] = useState(!initialUsers);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!initialUsers) {
-            const fetchRecommendedUsers = async () => {
-                try {
-                    setLoading(true);
-                    const response = await trendsService.getRecommendedUsers();
-                    if (response.status === "success" && response.data) {
-                        // Filter out current user if somehow included
-                        const filteredUsers = response.data.users.filter(
-                            user => !currentUser || user.username !== currentUser.username
-                        );
-                        setUsers(filteredUsers as RecommendedUser[]);
-                    } else {
-                        setError("Failed to load recommended users");
-                    }
-                } catch (err) {
-                    setError("Failed to load recommended users");
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            fetchRecommendedUsers();
-        }
-    }, [initialUsers, currentUser]);
+    const { users, loading, error } = useRecommendedUsers(initialUsers);
 
     if (loading) {
         return (
@@ -68,7 +37,7 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
         return (
             <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
                 <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Who to follow</h2>
-                <p className="text-red-500">Failed to load recommended users</p>
+                <p className="text-red-500">{error}</p>
             </div>
         );
     }
@@ -82,12 +51,11 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
         );
     }
 
-
     return (
         <div className="bg-[#121212] rounded-lg p-5 mb-5 border border-gray-800">
             <h2 className="text-xl font-bold mb-4 text-[var(--foreground)]">Who to follow</h2>
             <div className="space-y-4">
-                {users.map((user) => (
+                {users.map((user: RecommendedUser) => (
                     <div key={user._id} className="flex items-center gap-3">
                         <div className="flex-shrink-0 mr-2">
                             <Link href={`/${user.username}`}>
@@ -109,6 +77,7 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
                             </Link>
                         </div>
                         <FollowButton
+                            userId={user._id}
                             username={user.username}
                             initialFollowing={false}
                             size="sm"

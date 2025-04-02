@@ -8,8 +8,8 @@ interface ClickableHashtagProps {
 }
 
 export default function ClickableHashtag({ content }: ClickableHashtagProps): ReactNode {
-    // Regex to find hashtags in the content
-    const hashtagRegex = /#(\w+)/g;
+    // Use the same Unicode-aware regex as the backend
+    const hashtagRegex = /#([\p{L}\p{N}_]+)/gu;
 
     // Split content by hashtags and create an array of text and hashtag links
     const parts: ReactNode[] = [];
@@ -23,19 +23,23 @@ export default function ClickableHashtag({ content }: ClickableHashtagProps): Re
         }
 
         // Add the hashtag as a link
-        const hashtag = match[1];
+        const hashtag = match[1]; // The captured group (without #)
+        const fullMatch = match[0]; // The full match (with #)
+
         parts.push(
             <Link
                 key={`${hashtag}-${match.index}`}
-                href={`/hashtag/${hashtag}`}
+                // Encode the hashtag for the URL
+                href={`/hashtag/${encodeURIComponent(hashtag)}`}
                 className="text-blue-500 hover:underline"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()} // Prevent card navigation
             >
-                #{hashtag}
+                {/* Display the full match (e.g., #teste_produção) */}
+                {fullMatch}
             </Link>
         );
 
-        lastIndex = match.index + match[0].length;
+        lastIndex = match.index + fullMatch.length;
     }
 
     // Add any remaining text

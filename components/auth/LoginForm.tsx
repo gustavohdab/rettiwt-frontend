@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import useAuth from '@/lib/hooks/useAuth';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 // Map NextAuth error codes to user-friendly messages
 const errorMessages: { [key: string]: string } = {

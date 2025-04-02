@@ -1,5 +1,5 @@
-import TweetList from '@/components/tweet/TweetList';
 import Header from '@/components/layout/Header';
+import TweetList from '@/components/tweet/TweetList';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

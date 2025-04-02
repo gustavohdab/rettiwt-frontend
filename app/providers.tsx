@@ -2,6 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { ReactNode } from 'react';
+import { SocketProvider } from '../context/SocketProvider'; // Adjust path as needed
 
 interface ProvidersProps {
     children: ReactNode;
@@ -13,7 +14,9 @@ interface ProvidersProps {
 export default function Providers({ children }: ProvidersProps) {
     return (
         <SessionProvider>
-            {children}
+            <SocketProvider>
+                {children}
+            </SocketProvider>
         </SessionProvider>
     );
 } 

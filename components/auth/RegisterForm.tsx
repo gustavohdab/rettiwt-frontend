@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import useAuth from '@/lib/hooks/useAuth';
-import { ValidationError } from '@/types/api';
 import { getFieldError } from '@/lib/utils/form.utils';
+import { ValidationError } from '@/types/api';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const RegisterForm = () => {
     const [name, setName] = useState('');
@@ -127,7 +127,7 @@ const RegisterForm = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         className={`w-full p-2 border rounded focus:outline-none focus:ring-2 ${passwordError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
                         disabled={isLoading}
-                        minLength={6}
+                        minLength={8}
                         aria-invalid={!!passwordError}
                         aria-describedby={passwordError ? "password-error" : undefined}
                     />

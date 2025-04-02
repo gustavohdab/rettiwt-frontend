@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { TrendingHashtag } from "@/types/models";
-import trendsService from "@/lib/api/services/trends.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSocket } from "@/context/SocketContext";
+import trendsService from "@/lib/api/services/trends.service";
+import { TrendingHashtag } from "@/types/models";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface TrendingHashtagsProps {
     initialHashtags?: TrendingHashtag[];
 }
 
 export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsProps) {
+    const { emitter } = useSocket();
     const [hashtags, setHashtags] = useState<TrendingHashtag[]>(initialHashtags || []);
     const [loading, setLoading] = useState(!initialHashtags);
     const [error, setError] = useState<string | null>(null);
@@ -36,6 +38,24 @@ export default function TrendingHashtags({ initialHashtags }: TrendingHashtagsPr
             fetchTrendingHashtags();
         }
     }, [initialHashtags]);
+
+    // Listen for real-time trending updates
+    useEffect(() => {
+        if (emitter) {
+            const handleTrendsUpdate = (newHashtags: TrendingHashtag[]) => {
+                console.log("Received real-time trending update:", newHashtags);
+                setHashtags(newHashtags);
+            };
+
+            emitter.on('trends:update', handleTrendsUpdate);
+            console.log("TrendingHashtags: Attached listener for trends:update");
+
+            return () => {
+                emitter.off('trends:update', handleTrendsUpdate);
+                console.log("TrendingHashtags: Detached listener for trends:update");
+            };
+        }
+    }, [emitter]);
 
     if (loading) {
         return (

@@ -1,10 +1,10 @@
 'use client';
 
+import FollowButton from '@/components/profile/FollowButton';
 import getImageUrl from '@/lib/utils/getImageUrl';
 import { User } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import FollowButton from '@/components/profile/FollowButton';
 
 interface UserCardProps {
     user: User;
@@ -62,6 +62,7 @@ export default function UserCard({
                 {showFollowButton && !isCurrentUser && (
                     <div className="ml-4 flex-shrink-0">
                         <FollowButton
+                            userId={user._id}
                             username={user.username}
                             initialFollowing={isFollowing}
                             size="sm"

@@ -1,13 +1,12 @@
 "use client";
 
-import { followUser, unfollowUser } from "@/lib/actions/user.actions";
 import { formatDateToMonthYear } from "@/lib/utils/dateUtils";
 import getImageUrl from "@/lib/utils/getImageUrl";
 import { User } from "@/types/models";
 import { CalendarIcon, LinkIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import FollowButton from "./FollowButton";
 
 interface ProfileHeaderProps {
     user: User;
@@ -22,157 +21,109 @@ export default function ProfileHeader({
     isCurrentUser = false,
     isFollowing = false,
 }: ProfileHeaderProps) {
-    const [following, setFollowing] = useState(isFollowing);
-    const [followHovered, setFollowHovered] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleFollowClick = async () => {
-        if (isLoading) return;
-
-        setIsLoading(true);
-        try {
-            if (following) {
-                const result = await unfollowUser(user.username);
-                if (result.success) {
-                    setFollowing(false);
-                } else {
-                    console.error('Failed to unfollow user:', result.error);
-                }
-            } else {
-                const result = await followUser(user.username);
-                if (result.success) {
-                    setFollowing(true);
-                } else {
-                    console.error('Failed to follow user:', result.error);
-                }
-            }
-        } catch (error) {
-            console.error('Error toggling follow status:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     return (
-        <div className="border-b border-gray-200 dark:border-gray-800">
-            {/* Cover photo */}
-            <div className="h-48 bg-blue-100 dark:bg-blue-900 relative">
+        <div className="border-b border-gray-200 dark:border-gray-800 pb-4 relative">
+            {/* Cover Image */}
+            <div className="relative h-48 sm:h-64 bg-gray-200 dark:bg-gray-700">
                 {user.headerImage && (
                     <Image
                         src={getImageUrl(user.headerImage)}
-                        alt={`${user.name}'s cover`}
+                        alt={`${user.name || user.username}'s cover photo`}
                         fill
                         className="object-cover"
+                        priority
                     />
                 )}
             </div>
 
-            {/* Profile header */}
-            <div className="px-4 py-3 relative">
-                {/* Avatar */}
-                <div className="absolute -top-16 left-4 border-4 border-white dark:border-black rounded-full bg-white dark:bg-black overflow-hidden w-32 h-32">
-                    <Image
-                        src={getImageUrl(user.avatar)}
-                        alt={user.name}
-                        width={128}
-                        height={128}
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex justify-end mb-12">
-                    {isCurrentUser ? (
-                        <Link
-                            href={`/${user.username}/edit`}
-                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 font-semibold rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                            Edit profile
-                        </Link>
-                    ) : (
-                        <button
-                            onClick={handleFollowClick}
-                            onMouseEnter={() => setFollowHovered(true)}
-                            onMouseLeave={() => setFollowHovered(false)}
-                            disabled={isLoading}
-                            className={`px-4 py-2 rounded-full transition-colors font-semibold ${isLoading
-                                ? "opacity-70 cursor-not-allowed"
-                                : following
-                                    ? "border border-gray-300 dark:border-gray-600 hover:border-red-500 hover:text-red-500 dark:hover:text-red-500"
-                                    : "bg-black text-white dark:bg-white dark:text-black"
-                                }`}
-                        >
-                            {isLoading
-                                ? "Processing..."
-                                : following
-                                    ? followHovered
-                                        ? "Unfollow"
-                                        : "Following"
-                                    : "Follow"
-                            }
-                        </button>
-                    )}
-                </div>
-
-                {/* User info */}
-                <div className="mb-4">
-                    <h1 className="font-bold text-xl">{user.name}</h1>
-                    <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-                </div>
-
-                {/* Bio */}
-                {user.bio && <p className="mb-3">{user.bio}</p>}
-
-                {/* User metadata */}
-                <div className="flex flex-wrap text-gray-500 dark:text-gray-400 text-sm gap-x-4 gap-y-2 mb-3">
-                    {user.location && (
-                        <div className="flex items-center">
-                            <MapPinIcon className="h-4 w-4 mr-1" />
-                            <span>{user.location}</span>
+            <div className="px-4 sm:px-6">
+                {/* Avatar and Edit/Follow Button Section */}
+                <div className="flex justify-between items-end -mt-12 sm:-mt-16 mb-4">
+                    {/* Avatar */}
+                    <div className="avatar-container flex-shrink-0">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-gray-900 bg-white dark:bg-gray-900 overflow-hidden relative">
+                            {user.avatar ? (
+                                <Image
+                                    src={getImageUrl(user.avatar)}
+                                    alt={user.name || 'User avatar'}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 96px, 128px"
+                                    priority
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                                    <span className="text-3xl font-bold text-gray-500 dark:text-gray-400">
+                                        {user.name ? user.name.charAt(0).toUpperCase() : '?'}
+                                    </span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    {user.website && (
-                        <div className="flex items-center">
-                            <LinkIcon className="h-4 w-4 mr-1" />
-                            <a
-                                href={
-                                    user.website.startsWith("http")
-                                        ? user.website
-                                        : `https://${user.website}`
-                                }
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline"
-                                onClick={(e) => e.stopPropagation()}
+                    </div>
+
+                    {/* Action Button (Edit or Follow) */}
+                    <div className="pt-14 sm:pt-16">
+                        {isCurrentUser ? (
+                            <Link
+                                href={`/${user.username}/edit`}
+                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 font-semibold rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm"
                             >
-                                {user.website.replace(/^https?:\/\//, "")}
-                            </a>
-                        </div>
-                    )}
-                    {user.createdAt && (
-                        <div className="flex items-center">
-                            <CalendarIcon className="h-4 w-4 mr-1" />
-                            <span>Joined {formatDateToMonthYear(user.createdAt)}</span>
-                        </div>
-                    )}
+                                Edit profile
+                            </Link>
+                        ) : (
+                            <FollowButton
+                                userId={user._id}
+                                username={user.username}
+                                initialFollowing={isFollowing}
+                                size="md"
+                                className=""
+                            />
+                        )}
+                    </div>
                 </div>
 
-                {/* Following/Followers */}
-                <div className="flex gap-4 text-sm">
-                    <Link
-                        href={`/${user.username}/following`}
-                        className="hover:underline"
-                    >
-                        <span className="font-bold">{user.following?.length || 0}</span>{" "}
-                        <span className="text-gray-500 dark:text-gray-400">Following</span>
-                    </Link>
-                    <Link
-                        href={`/${user.username}/followers`}
-                        className="hover:underline"
-                    >
-                        <span className="font-bold">{user.followers?.length || 0}</span>{" "}
-                        <span className="text-gray-500 dark:text-gray-400">Followers</span>
-                    </Link>
+                {/* User Info Section */}
+                <div>
+                    <h1 className="text-xl sm:text-2xl font-bold text-[var(--foreground)]">{user.name}</h1>
+                    <p className="text-[var(--secondary)] mb-3">@{user.username}</p>
+                    {user.bio && <p className="text-[var(--foreground)] mb-3 whitespace-pre-wrap">{user.bio}</p>}
+
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-[var(--secondary)] text-sm mb-3">
+                        {user.location && (
+                            <span className="flex items-center gap-1">
+                                <MapPinIcon className="w-4 h-4" /> {user.location}
+                            </span>
+                        )}
+                        {user.website && (
+                            <span className="flex items-center gap-1">
+                                <LinkIcon className="w-4 h-4" />
+                                <a
+                                    href={user.website.startsWith('http') ? user.website : `https://${user.website}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    {user.website.replace(/^(https?:\/\/)/, '')}
+                                </a>
+                            </span>
+                        )}
+                        {user.createdAt && (
+                            <span className="flex items-center gap-1">
+                                <CalendarIcon className="w-4 h-4" /> Joined {formatDateToMonthYear(user.createdAt)}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex gap-4 text-sm">
+                        <Link href={`/${user.username}/following`} className="hover:underline">
+                            <span className="font-bold text-[var(--foreground)]">{user.following?.length || 0}</span>
+                            <span className="text-[var(--secondary)]"> Following</span>
+                        </Link>
+                        <Link href={`/${user.username}/followers`} className="hover:underline">
+                            <span className="font-bold text-[var(--foreground)]">{user.followers?.length || 0}</span>
+                            <span className="text-[var(--secondary)]"> Followers</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
