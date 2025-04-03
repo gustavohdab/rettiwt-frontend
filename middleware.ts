@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server";
 
 // Paths that don't require authentication
 const publicPaths = ["/", "/login", "/register"];
@@ -33,7 +32,6 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next();
 }
-
 // Specify which routes this middleware applies to
 export const config = {
     matcher: [

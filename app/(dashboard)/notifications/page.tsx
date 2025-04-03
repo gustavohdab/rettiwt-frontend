@@ -1,13 +1,11 @@
 "use client";
 
-import Header from "@/components/layout/Header"; // Assuming a standard Header component
-import GroupedNotificationItem, { GroupedNotification } from "@/components/notifications/GroupedNotificationItem"; // Import new component
+import Header from "@/components/layout/Header";
+import GroupedNotificationItem, { GroupedNotification } from "@/components/notifications/GroupedNotificationItem";
 import NotificationItem from "@/components/notifications/NotificationItem";
 import { useNotifications } from "@/lib/hooks/useNotifications";
 import { Notification } from "@/types/models";
 import { useEffect, useMemo } from "react";
-
-// TODO: Add Loading Skeletons and Error states
 
 // --- Grouping Logic --- 
 function groupNotifications(notifications: Notification[]): (Notification | GroupedNotification)[] {
@@ -78,10 +76,6 @@ export default function NotificationsPage() {
     // Memoize the grouped notifications to avoid re-computation on every render
     const processedNotifications = useMemo(() => groupNotifications(notifications), [notifications]);
 
-    // Optional: Mark notifications as read when the page is viewed
-    // This depends on desired UX. Could mark all visible ones, or only on click.
-    // For simplicity, we'll rely on the click within NotificationItem for now.
-
     // Basic infinite scroll trigger
     useEffect(() => {
         const handleScroll = () => {
@@ -135,7 +129,6 @@ export default function NotificationsPage() {
             {isLoading && (
                 <div className="p-4 text-center text-gray-500">
                     Loading more notifications...
-                    {/* Add Skeleton placeholders here if desired */}
                 </div>
             )}
 
