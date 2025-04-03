@@ -1,26 +1,25 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/actions/user-data.actions';
-import { User } from '@/types/models';
 import useAuth from '@/lib/hooks/useAuth';
+import { User } from '@/types/models';
 import {
+    ArrowLeftOnRectangleIcon,
+    BookmarkIcon,
     HomeIcon,
     MagnifyingGlassIcon,
-    UserIcon,
-    BookmarkIcon,
-    ArrowLeftOnRectangleIcon
+    UserIcon
 } from '@heroicons/react/24/outline';
 import {
+    BookmarkIcon as BookmarkIconSolid,
     HomeIcon as HomeIconSolid,
     MagnifyingGlassIcon as MagnifyingGlassIconSolid,
-    UserIcon as UserIconSolid,
-    BookmarkIcon as BookmarkIconSolid
+    UserIcon as UserIconSolid
 } from '@heroicons/react/24/solid';
-import { ComponentType } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { ComponentType, useEffect, useState } from 'react';
 
 interface NavigationItem {
     name: string;

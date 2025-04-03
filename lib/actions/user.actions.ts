@@ -1,10 +1,11 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import UserService from "@/lib/api/services/user.service";
-import { revalidatePath } from "next/cache";
+import { authOptions } from "@/lib/auth";
+import { SuggestedUser } from "@/types";
 import { UpdateProfileParams } from "@/types/actions";
+import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 /**
  * Follow a user
@@ -146,5 +147,45 @@ export async function updateProfile(data: UpdateProfileParams) {
     } catch (error) {
         console.error("Error in updateProfile action:", error);
         return { success: false, error: "An unexpected error occurred" };
+    }
+}
+
+/**
+ * Search for users to mention in the tweet composer.
+ * @param query The search query string.
+ * @returns A promise resolving to an array of suggested users or an empty array.
+ */
+export async function searchUsersForMention(
+    query: string
+): Promise<SuggestedUser[]> {
+    // Basic check: Don't search if query is empty or just '@'
+    if (!query || query.length < 1) {
+        return [];
+    }
+
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.accessToken) {
+            console.error("searchUsersForMention: Unauthorized");
+            return []; // Return empty array on auth error
+        }
+
+        const response = await UserService.getUserSuggestions(
+            query,
+            session.accessToken
+        );
+
+        if (response.status === "success" && response.data?.suggestions) {
+            return response.data.suggestions;
+        } else {
+            console.error(
+                "searchUsersForMention: API error:",
+                response.message
+            );
+            return []; // Return empty array on API error
+        }
+    } catch (error) {
+        console.error("Error in searchUsersForMention action:", error);
+        return []; // Return empty array on unexpected errors
     }
 }

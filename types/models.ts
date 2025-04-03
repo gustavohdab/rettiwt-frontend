@@ -3,10 +3,10 @@
 // They are derived from API types but adapted for UI requirements
 
 import type {
-    Tweet as ApiTweet,
-    User as ApiUser,
     Media as ApiMedia,
     TimelineResponse as ApiTimelineResponse,
+    Tweet as ApiTweet,
+    User as ApiUser,
     PaginationInfo,
 } from "./api";
 
@@ -59,6 +59,31 @@ export interface TweetThreadResponse {
     parentTweet?: Tweet;
     replies: Tweet[];
     pagination: PaginationInfo;
+}
+
+// Notification Model (for UI)
+export interface Notification {
+    _id: string;
+    recipient: string;
+    sender: {
+        _id: string;
+        username: string;
+        name: string;
+        avatar: string;
+    };
+    type: ApiTypes.NotificationType;
+    tweetId?: string;
+    tweetSnippet?: string;
+    read: boolean;
+    createdAt: string; // Keep as string for simplicity, format in UI
+}
+
+export interface NotificationPaginationInfo {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+    unreadCount: number;
 }
 
 // Type guard to check if an object is a User (not a string ID)
@@ -161,6 +186,14 @@ export interface RecommendedUser extends User {
     isFollowing?: boolean;
 }
 
+// Type for user mention suggestions
+export interface SuggestedUser {
+    _id: string;
+    username: string;
+    name: string;
+    avatar: string;
+}
+
 export function normalizeHashtagTweets(data: ApiTypes.HashtagTweetsResponse): {
     hashtag: string;
     tweets: Tweet[];
@@ -202,5 +235,25 @@ export function normalizeRecommendedUsers(
 } {
     return {
         users: data.users.map(normalizeUser) as RecommendedUser[],
+    };
+}
+
+export function normalizeNotification(
+    apiNotification: ApiTypes.Notification
+): Notification {
+    return {
+        _id: apiNotification._id,
+        recipient: apiNotification.recipient,
+        sender: {
+            _id: apiNotification.sender._id,
+            username: apiNotification.sender.username,
+            name: apiNotification.sender.name,
+            avatar: apiNotification.sender.avatar, // Assumes avatar is already a path or URL
+        },
+        type: apiNotification.type,
+        tweetId: apiNotification.tweet,
+        tweetSnippet: apiNotification.tweetSnippet,
+        read: apiNotification.read,
+        createdAt: apiNotification.createdAt,
     };
 }

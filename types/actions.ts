@@ -1,13 +1,14 @@
 // Action Types
 // These types are used for server actions and their responses
 
-import type { Tweet, User, Media } from "./models";
+import type { Tweet, User } from "./models";
 
 // Tweet creation
 export interface CreateTweetParams {
     content: string;
     images?: string[];
     parentId?: string;
+    quotedTweetId?: string;
 }
 
 export interface TweetActionResponse {

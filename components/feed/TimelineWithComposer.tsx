@@ -4,6 +4,7 @@ import Timeline from '@/components/feed/Timeline';
 import TweetComposer from '@/components/tweet/TweetComposer';
 import { useSocket } from '@/context/SocketContext';
 import type { Tweet } from '@/types';
+import { normalizeTweet } from '@/types/models';
 import { useEffect, useState } from 'react';
 
 interface TimelineWithComposerProps {
@@ -18,17 +19,18 @@ export default function TimelineWithComposer({
     currentUserId
 }: TimelineWithComposerProps) {
     const { emitter } = useSocket();
-    const [timelineTweets, setTimelineTweets] = useState<Tweet[]>(initialTweets);
+    const [timelineTweets, setTimelineTweets] = useState<Tweet[]>(initialTweets.map(normalizeTweet));
 
     const handleLocalNewTweet = (newTweet: Tweet) => {
         console.log("Handling local new tweet:", newTweet);
-        setTimelineTweets(prevTweets => [newTweet, ...prevTweets]);
+        setTimelineTweets(prevTweets => [normalizeTweet(newTweet), ...prevTweets]);
     };
 
     useEffect(() => {
-        const handleRemoteNewTweet = (newTweet: Tweet) => {
-            console.log("Handling remote new tweet:", newTweet);
-            setTimelineTweets(prevTweets => [newTweet, ...prevTweets]);
+        const handleRemoteNewTweet = (newTweetFromSocket: Tweet) => {
+            console.log("Handling remote new tweet:", newTweetFromSocket);
+            const normalizedNewTweet = normalizeTweet(newTweetFromSocket);
+            setTimelineTweets(prevTweets => [normalizedNewTweet, ...prevTweets]);
         };
 
         if (emitter) {

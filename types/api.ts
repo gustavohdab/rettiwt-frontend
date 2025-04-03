@@ -165,3 +165,47 @@ export interface ValidationError {
     field: string;
     message: string;
 }
+
+// Notification types
+export interface Sender {
+    _id: string;
+    username: string;
+    name: string;
+    avatar: string;
+}
+
+export type NotificationType =
+    | "like"
+    | "reply"
+    | "follow"
+    | "mention"
+    | "retweet"
+    | "quote";
+
+export interface Notification {
+    _id: string;
+    recipient: string; // User ID
+    sender: Sender; // Populated sender details
+    type: NotificationType;
+    tweet?: string; // Optional Tweet ID
+    tweetSnippet?: string; // Optional snippet
+    read: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface NotificationResponseData {
+    notifications: Notification[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        pages: number;
+        unreadCount: number;
+    };
+}
+
+export interface MarkReadResponse {
+    notification?: Notification; // Optional: return updated notification
+    modifiedCount?: number; // For mark all read
+}

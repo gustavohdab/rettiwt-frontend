@@ -2,17 +2,34 @@
 
 import { createReply } from '@/lib/actions/tweet.actions';
 import { uploadTweetMedia } from '@/lib/actions/upload.actions';
+import { searchUsersForMention } from '@/lib/actions/user.actions';
 import getImageUrl from '@/lib/utils/getImageUrl';
-import type { Tweet } from '@/types';
+import type { SuggestedUser, Tweet } from '@/types';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { useRef, useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
+import MentionSuggestions from '../tweet/MentionSuggestions';
 
 interface ReplyComposerProps {
     parentTweet: Tweet;
     onSuccess?: (tweet: Tweet) => void;
     autoFocus?: boolean;
+}
+
+// Simple debounce function (copied from TweetComposer)
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+    let timeout: NodeJS.Timeout | null = null;
+    return function executedFunction(...args: Parameters<T>) {
+        const later = () => {
+            timeout = null;
+            func(...args);
+        };
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(later, wait);
+    };
 }
 
 export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = false }: ReplyComposerProps) {
@@ -26,6 +43,116 @@ export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = fals
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    // State for mention suggestions (copied from TweetComposer)
+    const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+    const [suggestions, setSuggestions] = useState<SuggestedUser[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+
+    // Debounced function to fetch suggestions (copied from TweetComposer)
+    const debouncedFetchSuggestions = useCallback(
+        debounce(async (query: string) => {
+            if (!query) {
+                setSuggestions([]);
+                setShowSuggestions(false);
+                return;
+            }
+            setSuggestionsLoading(true);
+            try {
+                const results = await searchUsersForMention(query);
+                setSuggestions(results);
+                setShowSuggestions(true); // Show suggestions when results are ready
+                setActiveSuggestionIndex(-1); // Reset selection
+            } catch (error) {
+                console.error("Error fetching mention suggestions:", error);
+                setSuggestions([]);
+                setShowSuggestions(false);
+            } finally {
+                setSuggestionsLoading(false);
+            }
+        }, 300), // 300ms debounce delay
+        [] // No dependencies for the debounced function itself
+    );
+
+    // Handler for textarea changes (copied from TweetComposer)
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setContent(value);
+
+        const cursorPos = e.target.selectionStart;
+        const textBeforeCursor = value.substring(0, cursorPos);
+        const mentionMatch = textBeforeCursor.match(/@(\w+)$/);
+
+        if (mentionMatch) {
+            const query = mentionMatch[1];
+            setMentionQuery(query);
+            // Trigger debounced fetch
+            debouncedFetchSuggestions(query);
+            setShowSuggestions(true);
+        } else {
+            setMentionQuery(null);
+            setShowSuggestions(false);
+        }
+    };
+
+    // Handle selection from dropdown (copied from TweetComposer)
+    const handleMentionSelect = (username: string) => {
+        if (!textareaRef.current) return;
+
+        const currentContent = content;
+        const cursorPos = textareaRef.current.selectionStart;
+        const textBeforeCursor = currentContent.substring(0, cursorPos);
+        const mentionStartPos = textBeforeCursor.lastIndexOf('@');
+
+        if (mentionStartPos === -1) return; // Should not happen if called correctly
+
+        const textAfterCursor = currentContent.substring(cursorPos);
+
+        const newContent =
+            currentContent.substring(0, mentionStartPos) + // Text before @
+            `@${username} ` + // Inserted mention + space
+            textAfterCursor; // Text after the original query
+
+        setContent(newContent);
+        setShowSuggestions(false);
+        setMentionQuery(null);
+        setSuggestions([]);
+
+        // Focus and set cursor position after the inserted mention
+        setTimeout(() => {
+            textareaRef.current?.focus();
+            const newCursorPos = mentionStartPos + username.length + 2; // After @username
+            textareaRef.current?.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
+
+    // Handle keyboard navigation in suggestions (copied from TweetComposer)
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (showSuggestions && suggestions.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev =>
+                    prev < suggestions.length - 1 ? prev + 1 : prev
+                );
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev =>
+                    prev > 0 ? prev - 1 : 0 // Prevent going below 0 if already at top
+                );
+            } else if (e.key === 'Enter' || e.key === 'Tab') {
+                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
+                    e.preventDefault();
+                    handleMentionSelect(suggestions[activeSuggestionIndex].username);
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowSuggestions(false);
+                setMentionQuery(null);
+                setSuggestions([]);
+            }
+        }
+    };
 
     // Auto focus the textarea if needed
     if (autoFocus && textareaRef.current) {
@@ -165,14 +292,28 @@ export default function ReplyComposer({ parentTweet, onSuccess, autoFocus = fals
                     </div>
 
                     {/* Text area */}
-                    <textarea
-                        ref={textareaRef}
-                        placeholder="Tweet your reply"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full border-0 focus:ring-0 text-lg placeholder-gray-500 tracking-wide min-h-[80px] bg-transparent resize-none"
-                        maxLength={290} // Allow a bit extra to show the counter going negative
-                    />
+                    <div className="relative">
+                        <textarea
+                            ref={textareaRef}
+                            placeholder="Tweet your reply"
+                            value={content}
+                            onChange={handleContentChange}
+                            onKeyDown={handleKeyDown}
+                            className="w-full border-0 focus:ring-0 text-lg placeholder-gray-500 tracking-wide min-h-[80px] bg-transparent resize-none"
+                            maxLength={290} // Allow a bit extra to show the counter going negative
+                        />
+                        {/* Mention Suggestions Dropdown (copied from TweetComposer) */}
+                        {showSuggestions && (
+                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <MentionSuggestions
+                                    suggestions={suggestions}
+                                    loading={suggestionsLoading}
+                                    onSelect={handleMentionSelect}
+                                    activeIndex={activeSuggestionIndex}
+                                />
+                            </div>
+                        )}
+                    </div>
 
                     {/* Error message */}
                     {error && (

@@ -3,41 +3,56 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
-interface ClickableHashtagProps {
+interface ClickableContentProps {
     content: string;
 }
 
-export default function ClickableHashtag({ content }: ClickableHashtagProps): ReactNode {
-    // Use the same Unicode-aware regex as the backend
-    const hashtagRegex = /#([\p{L}\p{N}_]+)/gu;
+// Renamed conceptually to handle both hashtags and mentions
+export default function ClickableHashtag({ content }: ClickableContentProps): ReactNode {
+    // Combined regex for hashtags (group 1 & 2) and mentions (group 3 & 4)
+    // Hashtag: # followed by Unicode letters/numbers or underscore
+    // Mention: @ followed by basic alphanumeric or underscore
+    const pattern = /(#([\p{L}\p{N}_]+))|(@([a-zA-Z0-9_]+))/gu;
 
-    // Split content by hashtags and create an array of text and hashtag links
     const parts: ReactNode[] = [];
     let lastIndex = 0;
     let match;
 
-    while ((match = hashtagRegex.exec(content)) !== null) {
-        // Add text before the hashtag
+    while ((match = pattern.exec(content)) !== null) {
+        // Add text before the match
         if (match.index > lastIndex) {
             parts.push(content.substring(lastIndex, match.index));
         }
 
-        // Add the hashtag as a link
-        const hashtag = match[1]; // The captured group (without #)
-        const fullMatch = match[0]; // The full match (with #)
+        const fullMatch = match[0];
+        const hashtagContent = match[2]; // Content of hashtag (#hashtag)
+        const mentionContent = match[4]; // Content of mention (@mention)
 
-        parts.push(
-            <Link
-                key={`${hashtag}-${match.index}`}
-                // Encode the hashtag for the URL
-                href={`/hashtag/${encodeURIComponent(hashtag)}`}
-                className="text-blue-500 hover:underline"
-                onClick={(e) => e.stopPropagation()} // Prevent card navigation
-            >
-                {/* Display the full match (e.g., #teste_produção) */}
-                {fullMatch}
-            </Link>
-        );
+        if (hashtagContent) {
+            // Add the hashtag as a link
+            parts.push(
+                <Link
+                    key={`${hashtagContent}-${match.index}`}
+                    href={`/hashtag/${encodeURIComponent(hashtagContent)}`}
+                    className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {fullMatch}
+                </Link>
+            );
+        } else if (mentionContent) {
+            // Add the mention as a link
+            parts.push(
+                <Link
+                    key={`${mentionContent}-${match.index}`}
+                    href={`/${mentionContent}`} // No encodeURIComponent needed for this username regex
+                    className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {fullMatch}
+                </Link>
+            );
+        }
 
         lastIndex = match.index + fullMatch.length;
     }

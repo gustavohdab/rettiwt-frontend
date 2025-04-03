@@ -1,5 +1,6 @@
 'use client';
 
+import * as ApiTypes from "@/types/api"; // Import API types for notification payload
 import { TrendingHashtag, Tweet } from "@/types/models";
 import { EventEmitter } from 'events';
 import { useSession } from 'next-auth/react';
@@ -102,10 +103,21 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 emitterRef.current?.emit('trends:update', data.trendingHashtags);
             };
 
+            // --- Add Handler for New Notifications ---
+            const handleNewNotification = (data: ApiTypes.Notification) => {
+                console.log('Socket Event Received: notification:new', data);
+                // Forward the event via the internal emitter
+                emitterRef.current?.emit('notification:new', data);
+            };
+            // -----------------------------------------
+
+            // --- Register Listeners ---
             newSocket.on('user:follow', handleUserFollow);
             newSocket.on('user:unfollow', handleUserUnfollow);
             newSocket.on('tweet:new', handleNewTweet);
             newSocket.on('trends:update', handleTrendsUpdate);
+            newSocket.on('notification:new', handleNewNotification); // Listen for the event
+            // -------------------------
 
             setSocket(newSocket);
         }
@@ -117,6 +129,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 socket.off('user:unfollow');
                 socket.off('tweet:new');
                 socket.off('trends:update');
+                socket.off('notification:new'); // Unregister listener
                 socket.off('connect');
                 socket.off('disconnect');
                 socket.off('connect_error');

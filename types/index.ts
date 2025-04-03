@@ -15,12 +15,18 @@ export * from "./client";
 
 // Export specific model types directly
 // These are the ones that should be used by default in the app
-export type { User, Tweet, Media, TimelineResponse } from "./models";
+export type {
+    Media,
+    SuggestedUser,
+    TimelineResponse,
+    Tweet,
+    User,
+} from "./models";
 
 // Export utility functions
 export {
     isUser,
-    normalizeUser,
-    normalizeTweet,
     normalizeTimelineResponse,
+    normalizeTweet,
+    normalizeUser,
 } from "./models";

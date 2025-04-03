@@ -1,5 +1,5 @@
 import api from "@/lib/api/axios";
-import { ApiTypes, User, normalizeUser } from "@/types";
+import { ApiTypes, normalizeUser, SuggestedUser, User } from "@/types";
 
 /**
  * User service for handling user-related API endpoints
@@ -314,6 +314,48 @@ const UserService = {
         } catch (error) {
             console.error("Error searching users:", error);
             return { status: "error", message: "Failed to search users" };
+        }
+    },
+
+    /**
+     * Fetches user suggestions for mentions based on a query string.
+     * @param query The search query for usernames or names.
+     * @param accessToken Optional access token for authenticated requests.
+     * @returns An ApiResponse containing an array of suggested users.
+     */
+    getUserSuggestions: async (
+        query: string,
+        accessToken?: string
+    ): Promise<ApiTypes.ApiResponse<{ suggestions: SuggestedUser[] }>> => {
+        try {
+            if (!accessToken) {
+                console.error("No access token provided for user suggestions");
+                return {
+                    status: "error",
+                    message: "Authentication required",
+                };
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                params: { q: query }, // Pass query string as URL parameter
+            };
+
+            const response = await api.get<
+                ApiTypes.ApiResponse<{ suggestions: SuggestedUser[] }>
+            >("/users/suggestions", config);
+
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching user suggestions:", error);
+            return {
+                status: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to fetch suggestions",
+            };
         }
     },
 };

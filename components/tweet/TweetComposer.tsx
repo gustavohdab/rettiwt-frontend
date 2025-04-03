@@ -3,16 +3,38 @@
 import { createTweet } from '@/lib/actions/tweet.actions';
 import { uploadTweetMedia } from '@/lib/actions/upload.actions';
 import { getCurrentUser } from '@/lib/actions/user-data.actions';
+import { searchUsersForMention } from '@/lib/actions/user.actions';
 import getImageUrl from '@/lib/utils/getImageUrl';
-import { TweetComposerProps } from '@/types';
+import { SuggestedUser, Tweet, TweetComposerProps } from '@/types';
 import { User } from '@/types/models';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useTransition, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import MentionSuggestions from './MentionSuggestions';
+import QuotedTweetPreview from './QuotedTweetPreview';
 
-export default function TweetComposer({ placeholder = "What's happening?", parentId, onSuccess }: TweetComposerProps = {}) {
+// Simple debounce function
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+    let timeout: NodeJS.Timeout | null = null;
+    return function executedFunction(...args: Parameters<T>) {
+        const later = () => {
+            timeout = null;
+            func(...args);
+        };
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(later, wait);
+    };
+}
+
+interface ExtendedTweetComposerProps extends TweetComposerProps {
+    quotedTweetData?: Tweet | null;
+}
+
+export default function TweetComposer({ placeholder = "What's happening?", parentId, onSuccess, quotedTweetData = null }: ExtendedTweetComposerProps) {
     const { data: session } = useSession();
     const [isPending, startTransition] = useTransition();
     const [content, setContent] = useState('');
@@ -23,7 +45,121 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
     const [userData, setUserData] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const router = useRouter();
+
+    // State for mention suggestions
+    const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+    const [suggestions, setSuggestions] = useState<SuggestedUser[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+
+    // Debounced function to fetch suggestions
+    const debouncedFetchSuggestions = useCallback(
+        debounce(async (query: string) => {
+            if (!query) {
+                setSuggestions([]);
+                setShowSuggestions(false);
+                return;
+            }
+            setSuggestionsLoading(true);
+            try {
+                const results = await searchUsersForMention(query);
+                setSuggestions(results);
+                setShowSuggestions(true); // Show suggestions when results are ready
+                setActiveSuggestionIndex(-1); // Reset selection
+            } catch (error) {
+                console.error("Error fetching mention suggestions:", error);
+                setSuggestions([]);
+                setShowSuggestions(false);
+            } finally {
+                setSuggestionsLoading(false);
+            }
+        }, 300), // 300ms debounce delay
+        [] // No dependencies for the debounced function itself
+    );
+
+    // Handler for textarea changes
+    const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setContent(value);
+
+        const cursorPos = e.target.selectionStart;
+        const textBeforeCursor = value.substring(0, cursorPos);
+        const mentionMatch = textBeforeCursor.match(/@(\w+)$/);
+
+        if (mentionMatch) {
+            const query = mentionMatch[1];
+            setMentionQuery(query);
+            // Trigger debounced fetch
+            debouncedFetchSuggestions(query);
+            // TODO: Calculate position based on cursor
+            // For now, just shows it below
+            setShowSuggestions(true);
+        } else {
+            setMentionQuery(null);
+            setShowSuggestions(false);
+        }
+    };
+
+    // Handle selection from dropdown (will be passed to MentionSuggestions)
+    const handleMentionSelect = (username: string) => {
+        if (!textareaRef.current) return;
+
+        const currentContent = content;
+        const cursorPos = textareaRef.current.selectionStart;
+        const textBeforeCursor = currentContent.substring(0, cursorPos);
+        const mentionStartPos = textBeforeCursor.lastIndexOf('@');
+
+        if (mentionStartPos === -1) return; // Should not happen if called correctly
+
+        const textAfterCursor = currentContent.substring(cursorPos);
+
+        const newContent =
+            currentContent.substring(0, mentionStartPos) + // Text before @
+            `@${username} ` + // Inserted mention + space
+            textAfterCursor; // Text after the original query
+
+        setContent(newContent);
+        setShowSuggestions(false);
+        setMentionQuery(null);
+        setSuggestions([]);
+
+        // Focus and set cursor position after the inserted mention
+        setTimeout(() => {
+            textareaRef.current?.focus();
+            const newCursorPos = mentionStartPos + username.length + 2; // After @username 
+            textareaRef.current?.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+    };
+
+    // Handle keyboard navigation in suggestions
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (showSuggestions && suggestions.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev =>
+                    prev < suggestions.length - 1 ? prev + 1 : prev
+                );
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveSuggestionIndex(prev =>
+                    prev > 0 ? prev - 1 : 0 // Prevent going below 0 if already at top
+                );
+            } else if (e.key === 'Enter' || e.key === 'Tab') {
+                if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
+                    e.preventDefault();
+                    handleMentionSelect(suggestions[activeSuggestionIndex].username);
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setShowSuggestions(false);
+                setMentionQuery(null);
+                setSuggestions([]);
+            }
+        }
+    };
 
     // Fetch the current user data from the server
     useEffect(() => {
@@ -125,7 +261,8 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
             createTweet({
                 content,
                 images: uploadedImageUrls,
-                parentId
+                parentId,
+                quotedTweetId: quotedTweetData?._id || undefined
             }).then((result) => {
                 if (result.error) {
                     setError(result.error);
@@ -146,8 +283,12 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                     onSuccess(result.data);
                 }
 
-                // Don't need to refresh the page since we'll handle the update with onSuccess
-                // router.refresh();
+                // Maybe navigate away after successful quote
+                if (quotedTweetData && result.data) {
+                    // Example: go to the new tweet's page or feed
+                    // router.push(`/tweet/${result.data._id}`);
+                    // router.push('/feed'); 
+                }
             });
         });
     };
@@ -155,23 +296,6 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
     const remainingChars = 280 - content.length;
     const isOverLimit = remainingChars < 0;
     const isDisabled = isOverLimit || (!content.trim() && selectedImages.length === 0) || isPending || isUploading;
-
-    // Add this new function for highlighting hashtags
-    const renderContentWithHighlightedHashtags = () => {
-        if (!content) return null;
-
-        const words = content.split(/\b/);
-        return words.map((word, index) => {
-            if (word.startsWith('#') && word.length > 1) {
-                return (
-                    <span key={index} className="text-blue-500">
-                        {word}
-                    </span>
-                );
-            }
-            return <span key={index}>{word}</span>;
-        });
-    };
 
     if (!session?.user) {
         return null;
@@ -203,17 +327,34 @@ export default function TweetComposer({ placeholder = "What's happening?", paren
                 <div className="flex-1 min-w-0">
                     {/* Text area */}
                     <div className="relative">
-                        <div className="pointer-events-none absolute inset-0 opacity-0">
-                            {renderContentWithHighlightedHashtags()}
-                        </div>
                         <textarea
                             placeholder={placeholder}
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={handleContentChange}
+                            onKeyDown={handleKeyDown}
                             className="w-full border-0 focus:ring-0 text-lg placeholder-gray-500 tracking-wide min-h-[100px] bg-transparent resize-none"
                             maxLength={290}
+                            ref={textareaRef}
                         />
+                        {/* Mention Suggestions Dropdown (MOVED HERE) */}
+                        {showSuggestions && (
+                            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <MentionSuggestions
+                                    suggestions={suggestions}
+                                    loading={suggestionsLoading}
+                                    onSelect={handleMentionSelect}
+                                    activeIndex={activeSuggestionIndex}
+                                />
+                            </div>
+                        )}
                     </div>
+
+                    {/* Render Quoted Tweet Preview if data exists */}
+                    {quotedTweetData && (
+                        <div className="mt-3 mb-3 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <QuotedTweetPreview tweet={quotedTweetData} />
+                        </div>
+                    )}
 
                     {/* Error message */}
                     {error && (

@@ -1,10 +1,13 @@
 'use client';
 
 import { getCurrentUser } from '@/lib/actions/user-data.actions';
+import { useNotifications } from '@/lib/hooks/useNotifications';
+import { cn } from '@/lib/utils';
 import getImageUrl from '@/lib/utils/getImageUrl';
 import { User } from '@/types/models';
 import {
     ArrowLeftOnRectangleIcon,
+    BellIcon,
     BookmarkIcon,
     HashtagIcon,
     HomeIcon,
@@ -12,6 +15,7 @@ import {
     UserIcon
 } from '@heroicons/react/24/outline';
 import {
+    BellIcon as BellIconSolid,
     HashtagIcon as HashtagIconSolid,
     HomeIcon as HomeIconSolid,
     MagnifyingGlassIcon as MagnifyingGlassIconSolid,
@@ -23,9 +27,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const navigationItems = [
+const baseNavigationItems = [
     { name: 'Home', href: '/feed', icon: HomeIcon, activeIcon: HomeIconSolid },
     { name: 'Explore', href: '/explore', icon: HashtagIcon, activeIcon: HashtagIconSolid },
+    { name: 'Notifications', href: '/notifications', icon: BellIcon, activeIcon: BellIconSolid },
     { name: 'Search', href: '/search', icon: MagnifyingGlassIcon, activeIcon: MagnifyingGlassIconSolid },
     { name: 'Bookmarks', href: '/bookmarks', icon: BookmarkIcon },
 ];
@@ -35,6 +40,8 @@ export default function Sidebar() {
     const { data: session } = useSession();
     const [userData, setUserData] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { unreadCount } = useNotifications();
+
     // Fetch the current user data from the server
     useEffect(() => {
         const fetchUserData = async () => {
@@ -66,7 +73,7 @@ export default function Sidebar() {
 
     // Create all navigation items including profile with dynamic path
     const allNavigationItems = [
-        ...navigationItems,
+        ...baseNavigationItems,
         {
             name: 'Profile',
             href: username ? `/${username}` : '/profile',
@@ -102,18 +109,29 @@ export default function Sidebar() {
                     <nav className="space-y-1">
                         {allNavigationItems.map((item) => {
                             const isActive =
-                                item.name === "Profile" ? isProfileActive : pathname === item.href;
+                                item.name === "Profile" ? isProfileActive
+                                    : item.name === "Notifications" ? pathname === item.href
+                                        : pathname === item.href;
                             const Icon = isActive && item.activeIcon ? item.activeIcon : item.icon;
 
                             return (
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`flex items-center px-2 py-2.5 md:py-2 lg:py-3 text-base lg:text-lg font-medium rounded-full hover:bg-gray-800 transition-colors ${isActive ? "text-[var(--accent)]" : "text-[var(--foreground)]"
-                                        }`}
+                                    className={`flex items-center justify-between px-2 py-2.5 md:py-2 lg:py-3 text-base lg:text-lg font-medium rounded-full hover:bg-gray-800 transition-colors ${isActive ? "text-[var(--accent)]" : "text-[var(--foreground)]"}`}
                                 >
-                                    <Icon className="w-6 h-6 lg:w-7 lg:h-7 mr-4" aria-hidden="true" />
-                                    <span className="truncate">{item.name}</span>
+                                    <div className="flex items-center">
+                                        <Icon className="w-6 h-6 lg:w-7 lg:h-7 mr-4" aria-hidden="true" />
+                                        <span className="truncate">{item.name}</span>
+                                    </div>
+                                    {item.name === 'Notifications' && unreadCount > 0 && (
+                                        <span className={cn(
+                                            "ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white",
+                                            unreadCount > 9 && "px-1"
+                                        )}>
+                                            {unreadCount > 99 ? "99+" : unreadCount}
+                                        </span>
+                                    )}
                                 </Link>
                             );
                         })}

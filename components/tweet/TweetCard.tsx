@@ -3,20 +3,23 @@
 
 import ActionButton from '@/components/shared/ActionButton';
 import { likeTweet, retweetTweet, unlikeTweet, unretweetTweet } from '@/lib/actions/tweet.actions';
+import { cn } from '@/lib/utils';
 import getImageUrl from '@/lib/utils/getImageUrl';
 import type { TweetCardProps } from '@/types';
 import {
     ArrowPathRoundedSquareIcon,
     ArrowUpTrayIcon,
     ChatBubbleOvalLeftIcon,
-    HeartIcon
+    HeartIcon,
+    PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import BookmarkButton from './BookmarkButton';
+import QuotedTweetPreview from './QuotedTweetPreview';
 import TweetContent from './TweetContent';
 
 export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCardProps) {
@@ -41,6 +44,8 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
         tweet.engagementCount?.retweets || (Array.isArray(tweet.retweets) ? tweet.retweets.length : 0)
     );
     const [showCopiedTooltip, setShowCopiedTooltip] = useState(false);
+    const [retweetMenuOpen, setRetweetMenuOpen] = useState(false);
+    const retweetButtonRef = useRef<HTMLDivElement>(null);
 
     // Optimistic UI updates for like/unlike
     const handleLike = async (e: React.MouseEvent) => {
@@ -56,9 +61,16 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
         }
     };
 
-    // Optimistic UI updates for retweet/unretweet
-    const handleRetweet = async (e: React.MouseEvent) => {
+    // Handler for the main Retweet icon click (opens menu)
+    const toggleRetweetMenu = (e: React.MouseEvent) => {
         e.stopPropagation();
+        setRetweetMenuOpen(prev => !prev);
+    };
+
+    // Handler for clicking the "Retweet" option
+    const handleSimpleRetweet = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setRetweetMenuOpen(false);
         if (isRetweeted) {
             setIsRetweeted(false);
             setRetweetCount(prev => Math.max(0, prev - 1));
@@ -69,6 +81,26 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
             await retweetTweet(tweet._id);
         }
     };
+
+    // Handler for clicking the "Quote Tweet" option
+    const handleQuoteTweet = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setRetweetMenuOpen(false);
+        router.push(`/compose/tweet?quote=${tweet._id}`);
+    };
+
+    // Close menu if clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (retweetButtonRef.current && !retweetButtonRef.current.contains(event.target as Node)) {
+                setRetweetMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [retweetButtonRef]);
 
     const author = displayTweet.author;
 
@@ -211,6 +243,13 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                         </div>
                     )}
 
+                    {/* Quoted Tweet Preview (NEW) */}
+                    {displayTweet.quotedTweet && (
+                        <div className="mt-3 mb-3 border border-gray-700 rounded-xl overflow-hidden">
+                            <QuotedTweetPreview tweet={displayTweet.quotedTweet} />
+                        </div>
+                    )}
+
                     {/* Tweet actions */}
                     <div className="flex justify-between mt-3 text-[var(--secondary)]">
                         {/* Reply */}
@@ -220,15 +259,42 @@ export default function TweetCard({ tweet, currentUserId, withBorder }: TweetCar
                             defaultColorClass="hover:text-[var(--accent)]"
                         />
 
-                        {/* Retweet */}
-                        <ActionButton
-                            onClick={handleRetweet}
-                            Icon={ArrowPathRoundedSquareIcon}
-                            activeColorClass="text-green-500 hover:text-green-500"
-                            defaultColorClass="hover:text-green-500"
-                            active={isRetweeted}
-                            count={retweetCount}
-                        />
+                        {/* Retweet/Quote Button with Popover */}
+                        <div className="relative" ref={retweetButtonRef}>
+                            <ActionButton
+                                onClick={toggleRetweetMenu}
+                                Icon={ArrowPathRoundedSquareIcon}
+                                activeColorClass="text-green-500 hover:text-green-500"
+                                defaultColorClass="hover:text-green-500"
+                                active={isRetweeted}
+                                count={retweetCount}
+                            />
+                            {retweetMenuOpen && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none">
+                                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                        <button
+                                            onClick={handleSimpleRetweet}
+                                            className={cn(
+                                                "flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700",
+                                                isRetweeted && "font-semibold text-green-600 dark:text-green-400"
+                                            )}
+                                            role="menuitem"
+                                        >
+                                            <ArrowPathRoundedSquareIcon className="mr-3 h-5 w-5" aria-hidden="true" />
+                                            {isRetweeted ? 'Undo Retweet' : 'Retweet'}
+                                        </button>
+                                        <button
+                                            onClick={handleQuoteTweet}
+                                            className="flex items-center w-full px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            role="menuitem"
+                                        >
+                                            <PencilSquareIcon className="mr-3 h-5 w-5" aria-hidden="true" />
+                                            Quote Tweet
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Like */}
                         <ActionButton
