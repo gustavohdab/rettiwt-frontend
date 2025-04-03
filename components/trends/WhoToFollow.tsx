@@ -86,7 +86,7 @@ export default function WhoToFollow({ initialUsers }: WhoToFollowProps) {
                 ))}
             </div>
             <Link
-                href="/explore/who-to-follow"
+                href="/suggestions/users"
                 className="block text-white hover:text-gray-200 text-sm mt-4 font-medium bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-center transition"
             >
                 Show more

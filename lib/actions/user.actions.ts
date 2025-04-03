@@ -2,7 +2,7 @@
 
 import UserService from "@/lib/api/services/user.service";
 import { authOptions } from "@/lib/auth";
-import { SuggestedUser } from "@/types";
+import { ApiTypes, SuggestedUser } from "@/types";
 import { UpdateProfileParams } from "@/types/actions";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
@@ -187,5 +187,62 @@ export async function searchUsersForMention(
     } catch (error) {
         console.error("Error in searchUsersForMention action:", error);
         return []; // Return empty array on unexpected errors
+    }
+}
+
+/**
+ * Fetches paginated user recommendations for the 'Who to Follow' page.
+ * @param page The page number to fetch.
+ * @param limit The number of users per page.
+ * @returns A promise resolving to a PaginatedResponse of APIUser or an error object.
+ */
+export async function getPaginatedUserSuggestions(
+    page: number = 1,
+    limit: number = 10
+): Promise<
+    | {
+          success: true;
+          data: { items: ApiTypes.User[]; pagination: ApiTypes.PaginationInfo };
+      }
+    | { success: false; error: string }
+> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.accessToken) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // Call the new UserService method
+        const response = await UserService.getPaginatedRecommendations(
+            { page, limit },
+            session.accessToken
+        );
+
+        if (
+            response.status === "success" &&
+            response.data?.users &&
+            response.data?.pagination
+        ) {
+            return {
+                success: true,
+                data: {
+                    // Ensure the structure matches the expected return type
+                    items: response.data.users,
+                    pagination: response.data.pagination,
+                },
+            };
+        } else {
+            console.error(
+                "getPaginatedUserSuggestions: API error:",
+                response.message
+            );
+            return {
+                success: false,
+                error: response.message || "Failed to fetch user suggestions",
+            };
+        }
+    } catch (error) {
+        console.error("Error in getPaginatedUserSuggestions action:", error);
+        return { success: false, error: "An unexpected error occurred" };
     }
 }

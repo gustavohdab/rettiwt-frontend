@@ -358,6 +358,60 @@ const UserService = {
             };
         }
     },
+
+    /**
+     * Fetches paginated user recommendations from the dedicated endpoint.
+     * @param params Pagination parameters (page, limit).
+     * @param accessToken Optional access token for authenticated requests.
+     * @returns An ApiResponse containing paginated users and pagination info.
+     */
+    getPaginatedRecommendations: async (
+        params: { page: number; limit: number },
+        accessToken?: string
+    ): Promise<
+        ApiTypes.ApiResponse<{
+            users: ApiTypes.User[];
+            pagination: ApiTypes.PaginationInfo;
+        }>
+    > => {
+        try {
+            if (!accessToken) {
+                console.error(
+                    "No access token provided for paginated recommendations"
+                );
+                return {
+                    status: "error",
+                    message: "Authentication required",
+                };
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                params: { page: params.page, limit: params.limit },
+            };
+
+            // Call the new backend endpoint
+            const response = await api.get<
+                ApiTypes.ApiResponse<{
+                    users: ApiTypes.User[];
+                    pagination: ApiTypes.PaginationInfo;
+                }>
+            >("/users/recommendations/paginated", config);
+
+            // Return the raw API response here, transformation happens in Server Action if needed
+            return response.data;
+        } catch (error: any) {
+            console.error("Error fetching paginated recommendations:", error);
+            return {
+                status: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to fetch recommendations",
+            };
+        }
+    },
 };
 
 export default UserService;
